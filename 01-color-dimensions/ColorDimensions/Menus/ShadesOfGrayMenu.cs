@@ -8,20 +8,46 @@ namespace GraphFunc.Menus
     {
         private static Bitmap GrayShade1(Bitmap b)
         {
-            // TODO: First gray shader
-            return b;
+            var res = new Bitmap(b);
+            for (int x = 0; x < b.Width;  x++)
+            {
+                for (int y = 0; y < b.Height; y++)
+                {
+                    Color c = b.GetPixel(x, y);
+                    int br = (int)Math.Ceiling(0.3 * c.R + 0.59 * c.G + 0.11 * c.B);
+                    res.SetPixel(x, y, Color.FromArgb(br, br, br));
+                }
+            }
+            return res;
         }
         
         private static Bitmap GrayShade2(Bitmap b)
         {
-            // TODO: Second gray shader
-            return b;
+            var res = new Bitmap(b.Width, b.Height);
+            for (int x = 0; x < b.Width; x++)
+            {
+                for (int y = 0; y < b.Height; y++)
+                {
+                    Color c = b.GetPixel(x, y);
+                    int p = (int)Math.Ceiling(0.21 * c.R + 0.72 * c.G + 0.07 * c.B);
+                    res.SetPixel(x, y, Color.FromArgb(p, p, p));
+                }
+            }
+            return res;
         }
         
         private static Bitmap GrayDiff(Bitmap b1, Bitmap b2)
         {
-            // TODO: Gray diff shower
-            return b1;
+            Bitmap res = new Bitmap(b1.Width, b1.Height);
+            for (int x = 0; x < b1.Width; x++)
+            {
+                for (int y = 0; y < b1.Height; y++)
+                {
+                    int diff = Math.Abs(b1.GetPixel(x, y).R - b2.GetPixel(x, y).R);
+                    res.SetPixel(x, y, Color.FromArgb(diff, diff, diff));
+                }
+            }
+            return res;
         }
 
         private static int[] CalcGrayIntensity(Bitmap image)
