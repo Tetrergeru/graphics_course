@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -58,7 +59,11 @@ namespace GraphFunc
             };
             Controls.Add(MainPictre);
             MakeButtons();
-            
+
+            //для Андрея
+            //string str = Path.GetFullPath("C:/Users/genii/OneDrive/Рабочий стол/graphics_course/01-color-dimensions/ColorDimensions/fruits.jpg");
+            //image = new Bitmap(str);
+            //для всех остальных
             image = new Bitmap("image-1.jpeg");
             currentMenu = _menus[0];
             _menus[0].Add(this);
