@@ -10,26 +10,22 @@ namespace GraphFunc.Menus
     {
         private PictureBox ResultPicture;
 
-        private TextBox[] ParamControllers;
+        private NumericUpDown[] ParamControllers;
 
         private Button UpdateButton;
 
         private Label[] NameLabels;
 
-        private static Bitmap Adjust(Bitmap image, string h, string s, string v)
+        private static Bitmap Adjust(Bitmap image, decimal h, decimal s, decimal v)
         {
-            var H = Parse_Num(h);
-            var S = Parse_Num(s);
-            var V = Parse_Num(v);
-
             return FastBitmap.Select(image, cl =>
             {
-                var newCl = Change_HSV(Color.FromArgb(cl.r, cl.g, cl.b), H, S, V);
+                var newCl = Change_HSV(Color.FromArgb(cl.r, cl.g, cl.b), h, s, v);
                 return (newCl.R, newCl.G, newCl.B);
             });
         }
 
-        public static Color Change_HSV(Color c, double h, double s, double v)
+        public static Color Change_HSV(Color c, decimal h, decimal s, decimal v)
         {
             double R = (double)(c.R) / 255;
             double B = (double)(c.B) / 255;
@@ -61,17 +57,17 @@ namespace GraphFunc.Menus
                 H = 0;
 
             //
-            H += h;
+            H += (double)h;
             if (H < 0)
                 H = 0;
             if (H > 360)
                 H = 360;
-            S += s;
+            S += (double)s;
             if (S < 0)
                 S = 0;
             if (S > 1)
                 S = 1;
-            V += v;
+            V += (double)v;
             if (V < 0)
                 V = 0;
             if (V > 1)
@@ -131,7 +127,7 @@ namespace GraphFunc.Menus
         public RGBHSVMenu()
         {
 
-            ParamControllers = new TextBox[3];
+            ParamControllers = new NumericUpDown[3];
             NameLabels = new Label[3];
             var res = new PictureBox()
             {
@@ -159,12 +155,16 @@ namespace GraphFunc.Menus
                     default:
                         break;
                 }
-                var text = new TextBox()
+                var text = new NumericUpDown()
                 {
-                    Text = "0",
-                    Width = 50,
+                    Value = 0,
+                    Width = 60,
                     Left = 50,
                     Top = 380 + i * 40,
+                    DecimalPlaces = 3,
+                    Increment = 0.001M,
+                    Minimum =  -1,
+                    Maximum = 1,
                 };
                 var name = new Label()
                 {
@@ -176,6 +176,10 @@ namespace GraphFunc.Menus
                 ParamControllers[i] = text;
                 NameLabels[i] = name;
             }
+            ParamControllers[0].Maximum = 360;
+            ParamControllers[0].Minimum = -360;
+            ParamControllers[0].Increment = 1;
+            ParamControllers[0].Value = 0;
             var but = new Button()
             {
                 Text = "Update",
@@ -206,7 +210,7 @@ namespace GraphFunc.Menus
 
         public void Update(Form form)
         {
-            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Text, ParamControllers[1].Text, ParamControllers[2].Text).Scale(256, 256);;
+            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Value, ParamControllers[1].Value, ParamControllers[2].Value).Scale(256, 256);;
             ResultPicture.Image.Save("result1.png");
             Console.WriteLine("Yoosh!");
         }
