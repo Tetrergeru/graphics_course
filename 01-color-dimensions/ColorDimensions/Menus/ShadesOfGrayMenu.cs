@@ -39,7 +39,21 @@ namespace GraphFunc.Menus
                 }
             }
 
-            return res;
+            var (min, max) = ((byte) 255, (byte) 0);
+            FastBitmap.Select(res, cl =>
+            {
+                if (cl.r > max)
+                    max = cl.r;
+                if (cl.r < min)
+                    min = cl.r;
+                return cl;
+            });
+            
+            return FastBitmap.Select(res, cl =>
+            {
+                var t = (byte) ((cl.r - min) / (double)(max - min) * 255);
+                return (t, t, t);
+            });;
         }
 
         private static int[] CalcGrayIntensity(Bitmap image)
