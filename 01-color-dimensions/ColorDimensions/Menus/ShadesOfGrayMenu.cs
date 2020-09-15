@@ -23,27 +23,28 @@ namespace GraphFunc.Menus
                 return (br, br, br);
             });
         }
-        
+
         private static Bitmap GrayDiff(Bitmap b1, Bitmap b2)
         {
             var res = new Bitmap(b1.Width, b1.Height);
-            
+
             using (var fb1 = new FastBitmap(b1))
             using (var fb2 = new FastBitmap(b2))
             using (var fb3 = new FastBitmap(res))
             {
                 for (var i = 0; i < fb1.Count; i++)
                 {
-                    var diff = (byte)Math.Abs(fb1.GetI(i).r - fb2.GetI(i).r);
+                    var diff = (byte) Math.Abs(fb1.GetI(i).r - fb2.GetI(i).r);
                     fb3.SetI(i, (diff, diff, diff));
                 }
             }
+
             Console.WriteLine("Diff done");
-            for (var i = 0; i<10;i++)
+            for (var i = 0; i < 10; i++)
             for (var j = 0; j < 10; j++)
                 res.SetPixel(10 + i, 10 + j, Color.Black);
             return res;
-            
+
             for (int x = 0; x < b1.Width; x++)
             {
                 for (int y = 0; y < b1.Height; y++)
@@ -52,6 +53,7 @@ namespace GraphFunc.Menus
                     res.SetPixel(x, y, Color.FromArgb(diff, diff, diff));
                 }
             }
+
             return res;
         }
 

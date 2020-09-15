@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -25,7 +26,8 @@ namespace GraphFunc
                 drawer.DrawLine(new Pen(color), i, 0, i, (int)(height * (data[i] / max)));
             return bitmap;
         }
-        [System.STAThread]
+
+        [STAThread]
         static void Main(string[] args)
         {
             var _form = new Form(new List<IMenu>{new ShadesOfGrayMenu(), new RGBColorsMenu(), new RGBHSVMenu()});
