@@ -40,13 +40,12 @@ namespace GraphFunc.Menus
             }
 
             var (min, max) = ((byte) 255, (byte) 0);
-            FastBitmap.Select(res, cl =>
+            FastBitmap.ForEach(res, cl =>
             {
                 if (cl.r > max)
                     max = cl.r;
                 if (cl.r < min)
                     min = cl.r;
-                return cl;
             });
             
             return FastBitmap.Select(res, cl =>

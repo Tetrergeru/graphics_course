@@ -39,7 +39,24 @@ namespace GraphFunc
         {
             _source.UnlockBits(_bData);
         }
-        
+
+        public static void ForEach(Bitmap source, Action<(byte r, byte g, byte b)> action)
+        {
+            var bitmap = source.Scale(source.Width, source.Height);
+            var length = bitmap.Height * bitmap.Width * 4;
+            var bData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite,
+                bitmap.PixelFormat);
+
+            var scan0 = (byte*) bData.Scan0.ToPointer();
+            for (var i = 0; i < length; i += 4)
+            {
+                var data = scan0 + i;
+                action((data[0], data[1], data[2]));
+            }
+
+            bitmap.UnlockBits(bData);
+        }
+
         public static Bitmap Select(Bitmap source, Func<(byte r, byte g, byte b), (byte r, byte g, byte b)> transform)
         {
             var bitmap = source.Scale(source.Width, source.Height);
