@@ -20,12 +20,12 @@ namespace GraphFunc.Menus
         {
             return FastBitmap.Select(image, cl =>
             {
-                var newCl = Change_HSV(Color.FromArgb(cl.r, cl.g, cl.b), h, s, v);
+                var newCl = Change_HSV(cl, h, s, v);
                 return (newCl.R, newCl.G, newCl.B);
             });
         }
 
-        public static Color Change_HSV(Color c, decimal h, decimal s, decimal v)
+        private static Color Change_HSV((byte R, byte G, byte B) c, decimal h, decimal s, decimal v)
         {
             double R = (double)(c.R) / 255;
             double B = (double)(c.B) / 255;
@@ -106,27 +106,8 @@ namespace GraphFunc.Menus
             return Color.FromArgb((int)(255 * R), (int)(255 * G), (int)(255 * B));
         }
 
-        private static double Parse_Num(string s)
-        {
-            if (s != "0")
-            {
-                string str = s;
-                char i = s[0];
-                double res = 0;
-                str.Remove(0, 1);
-                res = double.Parse(s);
-                if (i.CompareTo('-') == 0)
-                    return res;
-                else
-                    return res;
-            }
-            else
-                return 0;
-        }
-
         public RGBHSVMenu()
         {
-
             ParamControllers = new NumericUpDown[3];
             NameLabels = new Label[3];
             var res = new PictureBox()

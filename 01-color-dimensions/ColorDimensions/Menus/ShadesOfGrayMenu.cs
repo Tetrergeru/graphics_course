@@ -39,21 +39,9 @@ namespace GraphFunc.Menus
                 }
             }
 
-            Console.WriteLine("Diff done");
             for (var i = 0; i < 10; i++)
             for (var j = 0; j < 10; j++)
                 res.SetPixel(10 + i, 10 + j, Color.Black);
-            return res;
-
-            for (int x = 0; x < b1.Width; x++)
-            {
-                for (int y = 0; y < b1.Height; y++)
-                {
-                    int diff = Math.Abs(b1.GetPixel(x, y).R - b2.GetPixel(x, y).R);
-                    res.SetPixel(x, y, Color.FromArgb(diff, diff, diff));
-                }
-            }
-
             return res;
         }
 

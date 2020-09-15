@@ -78,6 +78,7 @@ namespace GraphFunc
         {
             Width = 1000;
             Height = 1000;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             _menus = menus;
 
             MainPictre = new PictureBox()
@@ -90,12 +91,7 @@ namespace GraphFunc
             Controls.Add(MainPictre);
             MakeButtons();
 
-            //для Андрея
-            //string str = Path.GetFullPath("C:/Users/genii/OneDrive/Рабочий стол/graphics_course/01-color-dimensions/ColorDimensions/fruits.jpg");
-            //image = new Bitmap(str);
-            //image = new Bitmap(100, 100);
-            //для всех остальных
-            image = new Bitmap("image-1.jpeg");
+            image = new Bitmap(100, 100);
             currentMenu = _menus[0];
             _menus[0].Add(this);
             Update();
