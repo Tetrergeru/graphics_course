@@ -18,36 +18,48 @@ namespace GraphFunc.Menus
             }
         }
 
-        private static int GetColor(int color, Color fullColor)
+        private static Bitmap ExtractColor(Bitmap image, int color)
         {
             switch (color)
             {
                 case 0:
-                    return fullColor.R;
+                    return FastBitmap.Select(image,cl => (cl.r, 0, 0));
                 case 1:
-                    return fullColor.G;
+                    return FastBitmap.Select(image,cl => (0, cl.g, 0));
                 default:
-                    return fullColor.B;
+                    return FastBitmap.Select(image,cl => (0, 0, cl.b));
             }
-        }
-
-        private static Bitmap ExtractColor(Bitmap image, int color)
-        {
-            var result = new Bitmap(image.Width, image.Height);
-            
-            for (var i = 0; i < image.Width; i++)
-            for (var j = 0; j < image.Height; j++)
-                result.SetPixel(i, j, ExtractColor(color, image.GetPixel(i, j)));
-
-            return result;
         }
 
         private static int[] PlotColor(Bitmap image, int color)
         {
             var result = new int[256];
-            for (var i = 0; i < image.Width; i++)
-            for (var j = 0; j < image.Height; j++)
-                result[GetColor(color, image.GetPixel(i, j))]++;
+            
+            switch (color)
+            {
+                case 0:
+                    FastBitmap.Select(image, cl =>
+                    {
+                        result[cl.r]++;
+                        return (0, 0, 0);
+                    });
+                    break;
+                case 1:
+                    FastBitmap.Select(image, cl => 
+                    {
+                        result[cl.g]++;
+                        return (0, 0, 0);
+                    });
+                    break;
+                default:
+                    FastBitmap.Select(image, cl => 
+                    {
+                        result[cl.b]++;
+                        return (0, 0, 0);
+                    });
+                    break;
+            }
+            
             return result;
         }
 

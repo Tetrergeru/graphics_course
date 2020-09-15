@@ -18,16 +18,15 @@ namespace GraphFunc.Menus
 
         private static Bitmap Adjust(Bitmap image, string h, string s, string v)
         {
-            var result = new Bitmap(image.Width, image.Height);
-            double H = Parse_Num(h);
-            double S = Parse_Num(s);
-            double V = Parse_Num(v);
+            var H = Parse_Num(h);
+            var S = Parse_Num(s);
+            var V = Parse_Num(v);
 
-            for (var i = 0; i < image.Width; i++)
-                for (var j = 0; j < image.Height; j++)
-                    result.SetPixel(i, j, Change_HSV(image.GetPixel(i, j), H, S, V));
-
-            return result;
+            return FastBitmap.Select(image, cl =>
+            {
+                var newCl = Change_HSV(Color.FromArgb(cl.r, cl.g, cl.b), H, S, V);
+                return (newCl.R, newCl.G, newCl.B);
+            });
         }
 
         public static Color Change_HSV(Color c, double h, double s, double v)
@@ -202,11 +201,12 @@ namespace GraphFunc.Menus
                 Update(form);
             };
             form.Controls.Add(UpdateButton);
+            Update(form);
         }
 
         public void Update(Form form)
         {
-            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Text, ParamControllers[1].Text, ParamControllers[2].Text);
+            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Text, ParamControllers[1].Text, ParamControllers[2].Text).Scale(256, 256);;
             ResultPicture.Image.Save("result1.png");
             Console.WriteLine("Yoosh!");
         }
@@ -217,6 +217,7 @@ namespace GraphFunc.Menus
             for (var i = 0; i < 3; i++)
             {
                 form.Controls.Remove(ParamControllers[i]);
+                form.Controls.Remove(NameLabels[i]);
             }
             form.Controls.Remove(UpdateButton);
         }
