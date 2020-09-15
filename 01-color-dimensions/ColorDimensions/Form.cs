@@ -11,16 +11,21 @@ namespace GraphFunc
     public class Form : System.Windows.Forms.Form
     {
         public Bitmap image;
-        
+
         private readonly List<IMenu> _menus;
 
         private IMenu currentMenu;
 
         private PictureBox MainPictre;
-        
+
+        private void Update()
+        {
+            MainPictre.Image = image.Scale(256, 256);
+        }
+
         private void MakeButtons()
         {
-            for(var i = 0; i < _menus.Count; i++)
+            for (var i = 0; i < _menus.Count; i++)
             {
                 var button = new Button
                 {
@@ -42,6 +47,31 @@ namespace GraphFunc
                 };
                 Controls.Add(button);
             }
+
+            var loadfButton = new Button
+            {
+                Text = "Load image...",
+                Width = 100,
+                Height = 30,
+                Top = 50,
+                Left = 356,
+            };
+            loadfButton.Click += (o, e) =>
+            {
+                var dialog = new OpenFileDialog
+                {
+                    InitialDirectory = "c:\\",
+                    RestoreDirectory = true,
+                    ShowHelp = true,
+                };
+                var result = dialog.ShowDialog();
+                if (result != DialogResult.OK || dialog.SafeFileName == null)
+                    return;
+                image = new Bitmap(dialog.FileName);
+                currentMenu.Update(this);
+                Update();
+            };
+            Controls.Add(loadfButton);
         }
 
         public Form(List<IMenu> menus)
@@ -61,13 +91,13 @@ namespace GraphFunc
             MakeButtons();
 
             //для Андрея
-            //string str = Path.GetFullPath("C:/Users/genii/OneDrive/Рабочий стол/graphics_course/01-color-dimensions/ColorDimensions/fruits.jpg");
-            //image = new Bitmap(str);
+            string str = Path.GetFullPath("C:/Users/genii/OneDrive/Рабочий стол/graphics_course/01-color-dimensions/ColorDimensions/fruits.jpg");
+            image = new Bitmap(str);
             //для всех остальных
-            image = new Bitmap("image-1.jpeg");
+            //image = new Bitmap("image-1.jpeg");
             currentMenu = _menus[0];
             _menus[0].Add(this);
-            MainPictre.Image = image.Scale(256, 256);
+            Update();
         }
     }
 }

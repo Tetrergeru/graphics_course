@@ -25,7 +25,7 @@ namespace GraphFunc
                 drawer.DrawLine(new Pen(color), i, 0, i, (int)(height * (data[i] / max)));
             return bitmap;
         }
-        
+        [System.STAThread]
         static void Main(string[] args)
         {
             var _form = new Form(new List<IMenu>{new ShadesOfGrayMenu(), new RGBColorsMenu(), new RGBHSVMenu()});

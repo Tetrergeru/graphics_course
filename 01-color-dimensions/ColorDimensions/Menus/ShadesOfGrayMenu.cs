@@ -8,37 +8,42 @@ namespace GraphFunc.Menus
     {
         private static Bitmap GrayShade1(Bitmap b)
         {
-            var res = new Bitmap(b);
-            for (int x = 0; x < b.Width;  x++)
+            return FastBitmap.Select(b, cl =>
             {
-                for (int y = 0; y < b.Height; y++)
-                {
-                    Color c = b.GetPixel(x, y);
-                    int br = (int)Math.Ceiling(0.3 * c.R + 0.59 * c.G + 0.11 * c.B);
-                    res.SetPixel(x, y, Color.FromArgb(br, br, br));
-                }
-            }
-            return res;
+                var br = (byte)Math.Ceiling(0.3 * cl.r + 0.59 * cl.g + 0.11 * cl.b);
+                return (br, br, br);
+            });
         }
         
         private static Bitmap GrayShade2(Bitmap b)
         {
-            var res = new Bitmap(b.Width, b.Height);
-            for (int x = 0; x < b.Width; x++)
+            return FastBitmap.Select(b, cl =>
             {
-                for (int y = 0; y < b.Height; y++)
-                {
-                    Color c = b.GetPixel(x, y);
-                    int p = (int)Math.Ceiling(0.21 * c.R + 0.72 * c.G + 0.07 * c.B);
-                    res.SetPixel(x, y, Color.FromArgb(p, p, p));
-                }
-            }
-            return res;
+                var br = (byte)Math.Ceiling(0.21 * cl.r + 0.72 * cl.g + 0.07 * cl.b);
+                return (br, br, br);
+            });
         }
         
         private static Bitmap GrayDiff(Bitmap b1, Bitmap b2)
         {
-            Bitmap res = new Bitmap(b1.Width, b1.Height);
+            var res = new Bitmap(b1.Width, b1.Height);
+            
+            using (var fb1 = new FastBitmap(b1))
+            using (var fb2 = new FastBitmap(b2))
+            using (var fb3 = new FastBitmap(res))
+            {
+                for (var i = 0; i < fb1.Count; i++)
+                {
+                    var diff = (byte)Math.Abs(fb1.GetI(i).r - fb2.GetI(i).r);
+                    fb3.SetI(i, (diff, diff, diff));
+                }
+            }
+            Console.WriteLine("Diff done");
+            for (var i = 0; i<10;i++)
+            for (var j = 0; j < 10; j++)
+                res.SetPixel(10 + i, 10 + j, Color.Black);
+            return res;
+            
             for (int x = 0; x < b1.Width; x++)
             {
                 for (int y = 0; y < b1.Height; y++)

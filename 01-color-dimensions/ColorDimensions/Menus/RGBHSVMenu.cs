@@ -10,27 +10,26 @@ namespace GraphFunc.Menus
     {
         private PictureBox ResultPicture;
 
-        private NumericUpDown[] ParamControllers;
+        private TextBox[] ParamControllers;
 
         private Button UpdateButton;
 
         private Label[] NameLabels;
 
-        private static Bitmap Adjust(Bitmap image, decimal h, decimal s, decimal v)
+        private static Bitmap Adjust(Bitmap image, string h, string s, string v)
         {
-            var result = new Bitmap(image.Width, image.Height);
-            decimal H = h;
-            decimal S = s;
-            decimal V = v;
+            var H = Parse_Num(h);
+            var S = Parse_Num(s);
+            var V = Parse_Num(v);
 
-            for (var i = 0; i < image.Width; i++)
-                for (var j = 0; j < image.Height; j++)
-                    result.SetPixel(i, j, Change_HSV(image.GetPixel(i, j), H, S, V));
-
-            return result;
+            return FastBitmap.Select(image, cl =>
+            {
+                var newCl = Change_HSV(Color.FromArgb(cl.r, cl.g, cl.b), H, S, V);
+                return (newCl.R, newCl.G, newCl.B);
+            });
         }
 
-        public static Color Change_HSV(Color c, decimal h, decimal s, decimal v)
+        public static Color Change_HSV(Color c, double h, double s, double v)
         {
             double R = (double)(c.R) / 255;
             double B = (double)(c.B) / 255;
@@ -62,17 +61,17 @@ namespace GraphFunc.Menus
                 H = 0;
 
             //
-            H += (double)h;
+            H += h;
             if (H < 0)
                 H = 0;
             if (H > 360)
                 H = 360;
-            S += (double)s;
+            S += s;
             if (S < 0)
                 S = 0;
             if (S > 1)
                 S = 1;
-            V += (double)v;
+            V += v;
             if (V < 0)
                 V = 0;
             if (V > 1)
@@ -111,10 +110,28 @@ namespace GraphFunc.Menus
             return Color.FromArgb((int)(255 * R), (int)(255 * G), (int)(255 * B));
         }
 
+        private static double Parse_Num(string s)
+        {
+            if (s != "0")
+            {
+                string str = s;
+                char i = s[0];
+                double res = 0;
+                str.Remove(0, 1);
+                res = double.Parse(s);
+                if (i.CompareTo('-') == 0)
+                    return res;
+                else
+                    return res;
+            }
+            else
+                return 0;
+        }
+
         public RGBHSVMenu()
         {
 
-            ParamControllers = new NumericUpDown[3];
+            ParamControllers = new TextBox[3];
             NameLabels = new Label[3];
             var res = new PictureBox()
             {
@@ -142,16 +159,12 @@ namespace GraphFunc.Menus
                     default:
                         break;
                 }
-                var text = new NumericUpDown()
+                var text = new TextBox()
                 {
-                    Value = 0,
-                    Width = 70,
+                    Text = "0",
+                    Width = 50,
                     Left = 50,
                     Top = 380 + i * 40,
-                    Minimum = -1,
-                    Maximum = 1,
-                    DecimalPlaces = 3,
-                    Increment = 0.001M,
                 };
                 var name = new Label()
                 {
@@ -163,12 +176,6 @@ namespace GraphFunc.Menus
                 ParamControllers[i] = text;
                 NameLabels[i] = name;
             }
-            ParamControllers[0].Value = 0;
-            ParamControllers[0].Maximum = 360;
-            ParamControllers[0].Minimum = -360;
-            ParamControllers[0].Increment = 1;
-            ParamControllers[0].DecimalPlaces = 0;
-
             var but = new Button()
             {
                 Text = "Update",
@@ -194,11 +201,12 @@ namespace GraphFunc.Menus
                 Update(form);
             };
             form.Controls.Add(UpdateButton);
+            Update(form);
         }
 
         public void Update(Form form)
         {
-            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Value, ParamControllers[1].Value, ParamControllers[2].Value).Scale(256, 256);
+            ResultPicture.Image = Adjust(form.image, ParamControllers[0].Text, ParamControllers[1].Text, ParamControllers[2].Text).Scale(256, 256);;
             ResultPicture.Image.Save("result1.png");
             Console.WriteLine("Yoosh!");
         }
