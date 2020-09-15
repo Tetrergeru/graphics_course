@@ -39,9 +39,6 @@ namespace GraphFunc.Menus
                 }
             }
 
-            for (var i = 0; i < 10; i++)
-            for (var j = 0; j < 10; j++)
-                res.SetPixel(10 + i, 10 + j, Color.Black);
             return res;
         }
 
