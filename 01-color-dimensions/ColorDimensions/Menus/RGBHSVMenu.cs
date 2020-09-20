@@ -59,19 +59,19 @@ namespace GraphFunc.Menus
             //
             H += (double)h;
             if (H < 0)
-                H = 0;
+                H += 360;
             if (H > 360)
-                H = 360;
+                H -= 360;
             S += (double)s;
             if (S < 0)
-                S = 0;
+                S += 1;
             if (S > 1)
-                S = 1;
+                S -= 1;
             V += (double)v;
             if (V < 0)
-                V = 0;
+                V += 1;
             if (V > 1)
-                V = 1;
+                V -= 1;
 
             //
             double Hi = Math.Floor(H / 60) % 6;
