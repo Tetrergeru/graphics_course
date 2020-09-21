@@ -24,10 +24,10 @@ namespace GraphFunc
                 var button = new Button
                 {
                     BackColor = Color.White,
-                    Width = 70,
+                    Width = 72,
                     Height = 20,
-                    Top = 15,
-                    Left = 100 + i * 100,
+                    Top = 10,
+                    Left = 80 + i * 80,
                     Text = _tools[i].Name(),
                 };
                 var j = i;
@@ -58,7 +58,7 @@ namespace GraphFunc
             {
                 Width = 500,
                 Height = 500,
-                Top = 50,
+                Top = 70,
                 Left = 50,
             };
             mainPicture.MouseClick += (o, e) =>
@@ -68,6 +68,7 @@ namespace GraphFunc
                     case MouseButtons.Left:
                         _tools[_currentTool].Draw(_image, e.Location, _colorPicker.BackColor);
                         mainPicture.Image = _image;
+                        _tools[_currentTool].Stop();
                         break;
                     default:
                         _tools[_currentTool].Stop();
