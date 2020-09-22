@@ -68,7 +68,7 @@ namespace GraphFunc
                     case MouseButtons.Left:
                         _tools[_currentTool].Draw(_image, e.Location, _colorPicker.BackColor);
                         mainPicture.Image = _image;
-                        _tools[_currentTool].Stop();
+                        //_tools[_currentTool].Stop();
                         break;
                     default:
                         _tools[_currentTool].Stop();

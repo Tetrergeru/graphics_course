@@ -27,17 +27,23 @@ namespace GraphFunc
         }
 
         public void SetI(int i, (byte r, byte g, byte b) cl)
+            => SetI(i, (cl.r, cl.g, cl.b, 255));
+        
+
+        public void SetI(int i, (byte r, byte g, byte b, byte a) cl)
         {
             var data = _scan0 + i * 4;
-            (data[0], data[1], data[2]) = cl;
-            data[3] = 255;
+            (data[0], data[1], data[2], data[3]) = cl;
         }
 
         public void SetPixel(Point p, (byte r, byte g, byte b) cl)
-            => SetI(p.X * Width + p.Y, cl);
+            => SetI(p.X+ p.Y * Width , cl);
+        
+        public void SetPixel(Point p, (byte r, byte g, byte b, byte a) cl)
+            => SetI(p.X+ p.Y * Width , cl);
 
         public (byte r, byte g, byte b) GetPixel(Point p)
-            => GetI(p.X * Width + p.Y);
+            => GetI(p.X + p.Y * Width );
 
         public FastBitmap(Bitmap bitmap)
         {
