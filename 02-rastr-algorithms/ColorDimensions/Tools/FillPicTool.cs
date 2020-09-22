@@ -13,6 +13,7 @@ namespace GraphFunc.Tools
         public Bitmap _fill_image;
         public bool flag = true;
         public bool pic_flag = true;
+        public Point start_point;
 
         public void LoadImage()
         {
@@ -29,8 +30,22 @@ namespace GraphFunc.Tools
         }
         public void CopyLine(Bitmap image, int start, int fin, int y)
         {
+            int pic_x, pic_y;
+
+            if (y >= start_point.Y)
+                pic_y = (y - start_point.Y) % _fill_image.Height;
+            else
+                pic_y = _fill_image.Height - ((start_point.Y - y) % _fill_image.Height);
+
             for (int i = start; i < fin; i++)
-                image.SetPixel(i, y, _fill_image.GetPixel(i % _fill_image.Width, y % _fill_image.Height));
+            {
+                if (i >= start_point.X)
+                    pic_x = (i - start_point.X) % _fill_image.Width;
+                else
+                    pic_x = _fill_image.Width - ((start_point.X - i) % _fill_image.Width);
+                
+                image.SetPixel(i, y, _fill_image.GetPixel(pic_x, pic_y));
+            }
         }
         public void Stop()
         {
@@ -42,6 +57,7 @@ namespace GraphFunc.Tools
             if (pic_flag)
             {
                 pic_flag = false;
+                start_point = coords;
                 LoadImage();
             }
 
