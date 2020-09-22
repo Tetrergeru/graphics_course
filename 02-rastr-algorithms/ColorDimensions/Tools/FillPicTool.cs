@@ -35,6 +35,7 @@ namespace GraphFunc.Tools
         public void Stop()
         {
             flag = true;
+            pic_flag = true;
         }
         public void Draw(Bitmap image, Point coords, Color color)
         {
