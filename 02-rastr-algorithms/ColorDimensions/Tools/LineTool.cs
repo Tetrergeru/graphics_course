@@ -8,6 +8,12 @@ namespace GraphFunc.Tools
 {
     public class LineTool : ITool
     {
+        private readonly bool Wu;
+        public LineTool(bool wu)
+        {
+            Wu = wu;
+        }
+
         public static void LineBresenham(Bitmap image, Color color, Point from, Point to)
         {
             using (var bitmap = new FastBitmap(image))
@@ -48,9 +54,9 @@ namespace GraphFunc.Tools
         
         private static (byte r, byte g, byte b) AdjustIntensity((byte r, byte g, byte b) cl, (byte r, byte g, byte b) bc, double y)
             => (
-                (byte) (cl.r * (1 - y) + bc.r * (y)), 
-                (byte) (cl.g * (1 - y) + bc.g * (y)), 
-                (byte) (cl.b * (1 - y) + bc.b * (y))
+                (byte) (cl.r * (1 - y) + bc.r * y), 
+                (byte) (cl.g * (1 - y) + bc.g * y), 
+                (byte) (cl.b * (1 - y) + bc.b * y)
                 );
 
 
@@ -118,11 +124,13 @@ namespace GraphFunc.Tools
             }
             var lp = (Point) _coordinates;
             Console.WriteLine($"from: {lp}, to: {coords}");
-            LineWu(image, color, (lp.X, lp.Y), (coords.X, coords.Y));
-            //LineBresenham(image, color, (Point)_coordinates, coords);
+            if (Wu)
+                LineWu(image, color, (lp.X, lp.Y), (coords.X, coords.Y));
+            else
+                LineBresenham(image, color, (Point)_coordinates, coords);
             _coordinates = coords;
         }
 
-        public string Name() => "Line";
+        public string Name() => Wu ? "WuLine" : "BresenhaimLine";
     }
 }

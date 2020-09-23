@@ -30,7 +30,15 @@ namespace GraphFunc
         [STAThread]
         static void Main(string[] args)
         {
-            var _form = new Form(new List<ITool>{new ClearTool(), new DrawTool(), new FillColTool(), new FillPicTool(), new LineTool()});
+            var _form = new Form(new List<ITool>
+            {
+                new ClearTool(),
+                new DrawTool(),
+                new FillColTool(),
+                new FillPicTool(),
+                new LineTool(true),
+                new LineTool(false)
+            });
             Application.Run(_form);
         }
     }
