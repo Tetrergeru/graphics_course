@@ -24,10 +24,10 @@ namespace GraphFunc
                 var button = new Button
                 {
                     BackColor = Color.White,
-                    Width = 72,
+                    Width = 80,
                     Height = 20,
-                    Top = 10,
-                    Left = 80 + i * 80,
+                    Top = 10 + (i / 5) * 30,
+                    Left = 100 + (i % 5) * 100,
                     Text = _tools[i].Name(),
                 };
                 var j = i;

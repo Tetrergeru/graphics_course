@@ -131,6 +131,6 @@ namespace GraphFunc.Tools
             _coordinates = coords;
         }
 
-        public string Name() => Wu ? "WuLine" : "BresenhaimLine";
+        public string Name() => Wu ? "Wu Line" : "Br Line";
     }
 }
