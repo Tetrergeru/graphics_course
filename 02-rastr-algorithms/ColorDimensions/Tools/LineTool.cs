@@ -118,12 +118,10 @@ namespace GraphFunc.Tools
         {
             if (_coordinates == null)
             {
-                Console.WriteLine("123");
                 _coordinates = coords;
                 return;
             }
             var lp = (Point) _coordinates;
-            Console.WriteLine($"from: {lp}, to: {coords}");
             if (Wu)
                 LineWu(image, color, (lp.X, lp.Y), (coords.X, coords.Y));
             else

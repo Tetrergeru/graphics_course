@@ -10,11 +10,8 @@ namespace GraphFunc.Tools
 {
     public class FindBorderTool : ITool
     {
-        private Point? _coordinates = null;
-
         public void Stop()
         {
-            _coordinates = null;
         }
 
         private Tuple<int, int> nearPixel(int xsource, int ysource, int direction)
@@ -112,9 +109,7 @@ namespace GraphFunc.Tools
         {
             var startColor = image.GetPixel(coords.X, coords.Y);
             var nextPixelColor = image.GetPixel(coords.X, coords.Y);
-            var baseColor = color;
             var nextY = coords.Y;
-            List<Point> points = new List<Point>();
 
             while (startColor == nextPixelColor)
             {
@@ -124,7 +119,7 @@ namespace GraphFunc.Tools
             List<Tuple<int, int>> t = findBorders(image, coords.X, nextY);
             foreach (var point in t)
             {
-                image.SetPixel(point.Item1, point.Item2, Color.Red);
+                image.SetPixel(point.Item1, point.Item2, Color.IndianRed);
             }
         }
         
