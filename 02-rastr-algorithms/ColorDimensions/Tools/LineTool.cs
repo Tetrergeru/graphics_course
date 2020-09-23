@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
+using System.Security.Permissions;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace GraphFunc.Tools
 {
@@ -31,6 +33,74 @@ namespace GraphFunc.Tools
             }
         }
 
+        public static void Swap<T>(ref T a, ref T b)
+        {
+            var t = a;
+            a = b;
+            b = t;
+        }
+
+        private static double Fpart(double y)
+            => y - Math.Truncate(y);
+
+        private static double RFpart(double y)
+            => 1 - Fpart(y);
+        
+        private static (byte r, byte g, byte b) AdjustIntensity((byte r, byte g, byte b) cl, (byte r, byte g, byte b) bc, double y)
+            => (
+                (byte) (cl.r * (1 - y) + bc.r * (y)), 
+                (byte) (cl.g * (1 - y) + bc.g * (y)), 
+                (byte) (cl.b * (1 - y) + bc.b * (y))
+                );
+
+
+        private static void SetPixel(FastBitmap bitmap, Point point, (byte r, byte g, byte b) color, double y)
+        {
+            var cl = bitmap.GetPixel(point);
+            var res = AdjustIntensity(color, cl, y);
+            bitmap.SetPixel(point, res);
+        }
+
+        public static void LineWu(Bitmap image, Color color, (int X, int Y) from, (int X, int Y) to)
+        {
+            using (var bitmap = new FastBitmap(image))
+            {
+                var cl = (color.R, color.G, color.B);
+                var steep = Math.Abs(to.Y - from.Y) > Math.Abs(to.X - from.X);
+                if (steep)
+                {
+                    Swap(ref from.X, ref from.Y);
+                    Swap(ref to.X, ref to.Y);
+                }
+
+                if (from.X > to.X)
+                {
+                    Swap(ref from.X, ref to.X);
+                    Swap(ref from.Y, ref to.Y);
+                }
+
+                var dx = to.X - from.X;
+                var dy = to.Y - from.Y;
+                var gradient = dx == 0 ? 1.0 : dy * 1.0 / dx;
+                var y = from.Y + gradient;
+                for (var x = from.X; x != to.X; x += 1)
+                {
+                    if (steep)
+                    {
+                        SetPixel(bitmap, new Point((int) y, x), cl, Fpart(y));
+                        SetPixel(bitmap, new Point((int) y + 1, x), cl, RFpart(y));
+                    }
+                    else
+                    {
+                        SetPixel( bitmap, new Point(x, (int) y), cl, Fpart(y));
+                        SetPixel( bitmap, new Point(x, (int) y + 1), cl, RFpart(y));
+                    }
+
+                    y += gradient;
+                }
+            }
+        }
+
         private Point? _coordinates = null;
         
         public void Stop()
@@ -46,7 +116,10 @@ namespace GraphFunc.Tools
                 _coordinates = coords;
                 return;
             }
-            LineBresenham(image, color, (Point)_coordinates, coords);
+            var lp = (Point) _coordinates;
+            Console.WriteLine($"from: {lp}, to: {coords}");
+            LineWu(image, color, (lp.X, lp.Y), (coords.X, coords.Y));
+            //LineBresenham(image, color, (Point)_coordinates, coords);
             _coordinates = coords;
         }
 
