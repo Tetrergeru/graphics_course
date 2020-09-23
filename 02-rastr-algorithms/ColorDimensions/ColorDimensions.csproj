@@ -55,6 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\ClearTool.cs" />
     <Compile Include="Tools\FindBorderTool.cs" />
+    <Compile Include="Tools\DrawTool.cs" />
+    <Compile Include="Tools\FillColTool.cs" />
+    <Compile Include="Tools\FillPicTool.cs" />
     <Compile Include="Tools\ITool.cs" />
     <Compile Include="Tools\LineTool.cs" />
   </ItemGroup>
