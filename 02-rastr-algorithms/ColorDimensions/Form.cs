@@ -90,7 +90,7 @@ namespace GraphFunc
             {
                 var dialog = new ColorDialog
                 {
-                    AllowFullOpen = false,
+                    AllowFullOpen = true,
                     ShowHelp = true,
                     Color = _colorPicker.BackColor
                 };

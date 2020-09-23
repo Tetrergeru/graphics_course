@@ -62,48 +62,26 @@ namespace GraphFunc.Tools
                 curY = points2visit.Peek().Item2;
                 points2visit.Dequeue();
 
-                if (notVisited)
+                for (int i = 0; i < 8; i++)
                 {
-                    notVisited = false;
-                    for (int i = 0; i < 8; i++)
+                    Tuple<int, int> point = nearPixel(currX, curY, ((direction - i) + 8) % 8);
+                    String str = point.Item1.ToString() + "," + point.Item2.ToString();
+                    if (image.GetPixel(point.Item1, point.Item2) != c)
                     {
-                        Tuple<int, int> point = nearPixel(currX, curY, (direction - i + 8) % 8);
-                        String str = point.Item1.ToString() + "," + point.Item2.ToString();
-                        if (image.GetPixel(point.Item1, point.Item2) != c)
+                        if (!visited.Contains(str))
                         {
-                            if (!visited.Contains(str))
-                            {
-                                direction = (direction - i + 10) % 8;
-                                points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
-                                visited.Add(str);
-                                points.Add(Tuple.Create(point.Item1, point.Item2));
-                                break;
-                            }
-
+                            direction = (direction - i + 10) % 8;
+                            points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
+                            visited.Add(str);
+                            points.Add(Tuple.Create(point.Item1, point.Item2));
+                            break;
                         }
+
                     }
                 }
-                else
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        Tuple<int, int> point = nearPixel(currX, curY, ((direction - i) + 8) % 8);
-                        String str = point.Item1.ToString() + "," + point.Item2.ToString();
-                        if (image.GetPixel(point.Item1, point.Item2) != c)
-                        {
-                            if (!visited.Contains(str))
-                            {
-                                direction = (direction - i + 10) % 8;
-                                points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
-                                visited.Add(str);
-                                points.Add(Tuple.Create(point.Item1, point.Item2));
-                                break;
-                            }
 
-                        }
-                    }
-                }
             }
+
             return points;
         }
 
