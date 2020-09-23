@@ -37,7 +37,8 @@ namespace GraphFunc
                 new FillColTool(),
                 new FillPicTool(),
                 new LineTool(true),
-                new LineTool(false)
+                new LineTool(false),
+                new FindBorderTool(),
             });
             Application.Run(_form);
         }
