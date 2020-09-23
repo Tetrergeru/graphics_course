@@ -49,7 +49,7 @@ namespace GraphFunc.Tools
             HashSet<string> visited = new HashSet<string>();
             bool notVisited = true;
 
-            Color c = image.GetPixel(x, y);
+            Color c = image.GetPixel(x, y + 10);
             int direction = 5;
             int currX = 0;
             int curY = 0;
@@ -69,14 +69,15 @@ namespace GraphFunc.Tools
                     {
                         Tuple<int, int> point = nearPixel(currX, curY, (direction - i + 8) % 8);
                         String str = point.Item1.ToString() + "," + point.Item2.ToString();
-                        if (image.GetPixel(point.Item1, point.Item2) == c)
+                        if (image.GetPixel(point.Item1, point.Item2) != c)
                         {
                             if (!visited.Contains(str))
                             {
-                                direction = (direction + i + 2) % 8;
+                                direction = (direction - i + 10) % 8;
                                 points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
                                 visited.Add(str);
                                 points.Add(Tuple.Create(point.Item1, point.Item2));
+                                break;
                             }
 
                         }
@@ -88,14 +89,15 @@ namespace GraphFunc.Tools
                     {
                         Tuple<int, int> point = nearPixel(currX, curY, ((direction - i) + 8) % 8);
                         String str = point.Item1.ToString() + "," + point.Item2.ToString();
-                        if (image.GetPixel(point.Item1, point.Item2) == c)
+                        if (image.GetPixel(point.Item1, point.Item2) != c)
                         {
                             if (!visited.Contains(str))
                             {
-                                direction = (direction + i + 2) % 8;
+                                direction = (direction - i + 10) % 8;
                                 points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
                                 visited.Add(str);
                                 points.Add(Tuple.Create(point.Item1, point.Item2));
+                                break;
                             }
 
                         }
