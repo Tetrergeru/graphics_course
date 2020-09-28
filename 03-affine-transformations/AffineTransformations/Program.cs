@@ -10,7 +10,10 @@ namespace GraphFunc
 {
     public static class Program
     {
-        [STAThread]
+        public static Point ToPoint(this PointF point)
+            => new Point((int) point.X, (int) point.Y);
+
+            [STAThread]
         private static void Main(string[] args)
         {
             var form = new Form(new List<IDrawingTool>
@@ -20,6 +23,7 @@ namespace GraphFunc
                 new DrawingToolWrapper(new AddPointTool()),
                 new DrawingToolWrapper(new SelectTool()),
                 new LeftRightTool(),
+                new ScaleTool(),
             });
             Application.Run(form);
         }

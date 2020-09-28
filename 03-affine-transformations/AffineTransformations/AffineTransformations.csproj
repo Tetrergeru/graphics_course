@@ -50,10 +50,12 @@
     <Compile Include="DrawingTool\DrawingToolWrapper.cs" />
     <Compile Include="DrawingTool\IDrawingTool.cs" />
     <Compile Include="DrawingTool\LeftRightTool.cs" />
+    <Compile Include="DrawingTool\ScaleTool.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Matrix.cs" />
     <Compile Include="Polygon.cs" />
     <Compile Include="PolygonContainer.cs" />
     <Compile Include="Program.cs" />
