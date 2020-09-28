@@ -66,7 +66,7 @@ namespace GraphFunc.Tools
                         break;
                     }
                 }
-                if (startPoint.Item1 == point.Item1 && startPoint.Item2 == point.Item2)
+                if (startPoint.Item1 == point.Item1 && startPoint.Item2 == point.Item2 && (direction - 5 + 8) % 8 < 4)
                     return points;
             }
         }
