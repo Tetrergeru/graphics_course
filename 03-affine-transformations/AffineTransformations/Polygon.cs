@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace GraphFunc
 {
     public class Polygon
     {
-        private readonly List<Point> _points = new List<Point>();
+        private List<Point> _points = new List<Point>();
 
+        private List<Point> _copy;
+        
         public IReadOnlyList<Point> Points => _points;
 
         public void AddPoint(Point point)
@@ -57,9 +61,28 @@ namespace GraphFunc
             // TODO
         }
 
-        public void Scale(PointF origin, double scale)
+        public void Save()
         {
-            // TODO
+            _copy = _points.ToList();
+        }
+
+        public void Load()
+        {
+            _points = _copy.ToList();
+        }
+
+        public void Scale(PointF origin, (double w, double h) scale)
+        {
+            var matrix = new Matrix
+            {
+                [0, 0] = (float) scale.w,
+                [1, 1] = (float) scale.h,
+                [2, 2] = 1,
+            };
+            for (var i = 0; i < _points.Count; i++)
+            {
+                _points[i] = matrix.Multiply(_points[i]).ToPoint();
+            }
         }
 
         public static void DrawPoint(Graphics graphics, Point point, Color color, int radius = 2)
