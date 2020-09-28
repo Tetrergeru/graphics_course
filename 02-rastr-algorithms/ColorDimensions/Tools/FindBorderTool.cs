@@ -20,23 +20,23 @@ namespace GraphFunc.Tools
             switch (direction)
             {
                 case 0:
-                    return Tuple.Create(xsource - 1, ysource - 1);
-                case 1:
-                    return Tuple.Create(xsource, ysource - 1);
-                case 2:
-                    return Tuple.Create(xsource + 1, ysource - 1);
-                case 3:
                     return Tuple.Create(xsource + 1, ysource);
+                case 1:
+                    return Tuple.Create(xsource + 1, ysource - 1);
+                case 2:
+                    return Tuple.Create(xsource, ysource - 1);
+                case 3:
+                    return Tuple.Create(xsource - 1, ysource - 1);
                 case 4:
-                    return Tuple.Create(xsource + 1, ysource + 1);
-                case 5:
-                    return Tuple.Create(xsource, ysource + 1);
-                case 6:
-                    return Tuple.Create(xsource - 1, ysource + 1);
-                case 7:
                     return Tuple.Create(xsource - 1, ysource);
+                case 5:
+                    return Tuple.Create(xsource - 1, ysource + 1);
+                case 6:
+                    return Tuple.Create(xsource, ysource + 1);
+                case 7:
+                    return Tuple.Create(xsource + 1, ysource + 1);
                 default:
-                    return Tuple.Create(xsource,  ysource - 1);
+                    throw new Exception("wtf?");
             }
         }
 
@@ -44,44 +44,31 @@ namespace GraphFunc.Tools
 
         private List<Tuple<int, int>> findBorders(Bitmap image, int x, int y)
         {
-            Queue<Tuple<int, int>> points2visit = new Queue<Tuple<int, int>>();
             List<Tuple<int, int>> points = new List<Tuple<int, int>>();
-            HashSet<Tuple<int, int>> visited = new HashSet<Tuple<int, int>>();
-            bool notVisited = true;
 
-            Color c = image.GetPixel(x, y + 10);
+            Color c = image.GetPixel(x, y + 1);
+            var startPoint = Tuple.Create(x, y);
             int direction = 5;
-            int currX = 0;
-            int curY = 0;
-            points.Add(Tuple.Create(x, y));
-            points2visit.Enqueue(Tuple.Create(x, y));
-            visited.Add(Tuple.Create(x,y));
-            while (points2visit.Count != 0)
-            {
-                currX = points2visit.Peek().Item1;
-                curY = points2visit.Peek().Item2;
-                points2visit.Dequeue();
+            points.Add(startPoint);
 
+            while (true)
+            {
+                Tuple<int, int> point = Tuple.Create(-1, -1); 
                 for (int i = 0; i < 8; i++)
                 {
-                    Tuple<int, int> point = nearPixel(currX, curY, ((direction - i) + 8) % 8);
+                    point = nearPixel(x, y, ((direction - i) + 8) % 8);
                     if (image.GetPixel(point.Item1, point.Item2) != c)
                     {
-                        if (!visited.Contains(point))
-                        {
-                            direction = (direction - i + 10) % 8;
-                            points2visit.Enqueue(Tuple.Create(point.Item1, point.Item2));
-                            visited.Add(point);
-                            points.Add(Tuple.Create(point.Item1, point.Item2));
-                            break;
-                        }
-
+                        direction = (direction - i + 10) % 8;
+                        points.Add(Tuple.Create(point.Item1, point.Item2));
+                        x = point.Item1;
+                        y = point.Item2;
+                        break;
                     }
                 }
-
+                if (startPoint.Item1 == point.Item1 && startPoint.Item2 == point.Item2)
+                    return points;
             }
-
-            return points;
         }
 
         public void Draw(Bitmap image, Point coords, Color color)
@@ -98,7 +85,7 @@ namespace GraphFunc.Tools
             List<Tuple<int, int>> t = findBorders(image, coords.X, nextY);
             foreach (var point in t)
             {
-                image.SetPixel(point.Item1, point.Item2, Color.IndianRed);
+                image.SetPixel(point.Item1, point.Item2, Color.Red);
             }
         }
         
