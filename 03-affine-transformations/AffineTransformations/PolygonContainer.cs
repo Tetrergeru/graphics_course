@@ -29,6 +29,8 @@ namespace GraphFunc
         public void Select(int idxOfSelected)
             => _selectedPolygon = idxOfSelected;
         
+        public Polygon Selected => _polygons[_selectedPolygon];
+        
         public void PopPolygon()
         {
             if (NoPolygons)

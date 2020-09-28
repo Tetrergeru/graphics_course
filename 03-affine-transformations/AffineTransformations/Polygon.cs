@@ -25,11 +25,11 @@ namespace GraphFunc
             PointF a = new PointF(p.X, p.Y);
             PointF edge_start = points[points.Count - 1];
             PointF edge_fin;
-            int parity = 0;
-            for (int i = 0; i < points.Count; i++)
+            var parity = 0;
+            foreach (var point in points)
             {
-                edge_fin = points[i];
-                Edge e = new Edge(edge_start, edge_fin);
+                edge_fin = point;
+                var e = new Edge(edge_start, edge_fin);
                 switch (e.edgeType(a))
                 {
                     case Edge.Edge_Instance.TOUCHING:
@@ -37,12 +37,27 @@ namespace GraphFunc
                     case Edge.Edge_Instance.CROSSING:
                         parity = 1 - parity;
                         break;
-                    default: break;
                 }
                 edge_start = edge_fin;
             }
-            return (parity == 1 ? true : false);
+            return parity == 1;
         }
+
+        public void Rotate(PointF origin, double angle)
+        {
+            // TODO
+        }
+
+        public void Move(PointF delta)
+        {
+            // TODO
+        }
+
+        public void Scale(PointF origin, double scale)
+        {
+            // TODO
+        }
+
         private void DrawPoint(Graphics graphics, Point point, Color color)
         {
             graphics.FillEllipse(new SolidBrush(color), new Rectangle(point.X - 2, point.Y - 2, 4, 4));
