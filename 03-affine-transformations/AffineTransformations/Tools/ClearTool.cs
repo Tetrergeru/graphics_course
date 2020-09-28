@@ -12,11 +12,11 @@ namespace GraphFunc.Tools
         public void OnUse(PolygonContainer polygonContainer, Point point)
         {
         }
-
-        public string Name()
-            => "Clear";
         
         public bool CanUseInField()
             => false;
+        
+        public override string ToString()
+            => "Clear";
     }
 }

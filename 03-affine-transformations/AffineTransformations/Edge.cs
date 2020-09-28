@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace GraphFunc
 {
-    internal class Edge
+    class Edge
     {
         private PointF _source;
 
