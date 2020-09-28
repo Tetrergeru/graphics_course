@@ -13,9 +13,10 @@ namespace GraphFunc.Tools
         {
         }
 
-        public string Name() => "Delete";
-        
         public bool CanUseInField()
             => false;
+        
+        public override string ToString()
+            => "Delete";
     }
 }

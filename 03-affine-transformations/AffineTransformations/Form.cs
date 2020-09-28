@@ -2,34 +2,31 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using GraphFunc.DrawingTool;
 using GraphFunc.Tools;
 
 namespace GraphFunc
 {
     public class Form : System.Windows.Forms.Form
     {
-        private readonly Bitmap _image;
+        private readonly PolygonContainer _polygonContainer = new PolygonContainer();
 
-        private readonly PolygonContainer polygonContainer = new PolygonContainer();
-
-        private readonly Button AddPolygon;
-
-        private PictureBox mainPicture;
+        private readonly PictureBox _mainPicture;
         
         private readonly List<Button> _toolButtons = new List<Button>();
         
-        private List<ITool> _tools = new List<ITool>();
+        private readonly List<IDrawingTool> _tools;
 
         private int _currentTool;
 
-        public Form(List<ITool> tools)
+        public Form(List<IDrawingTool> tools)
         {
             _tools = tools;
             Width = 612;
             Height = 638;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             
-            mainPicture = new PictureBox
+            _mainPicture = new PictureBox
             {
                 Width = 500,
                 Height = 500,
@@ -37,20 +34,19 @@ namespace GraphFunc
                 Left = 50,
                 BackColor = Color.White,
             };
-            mainPicture.MouseClick += (o, e) =>
-            {
-                switch (e.Button)
-                {
-                    case MouseButtons.Left:
-                        _tools[_currentTool].OnUse(polygonContainer, e.Location);
-                        break;
-                    case MouseButtons.Right:
-                        break;
-                }
-
-                DrawPolygons();
-            };
-            Controls.Add(mainPicture);
+            _mainPicture.MouseDown +=
+                (o, e) =>
+                    Draw(drawer =>
+                        _tools[_currentTool].OnMouseDown(e.Location, drawer));
+            _mainPicture.MouseUp +=
+                (o, e) =>
+                    Draw(drawer =>
+                        _tools[_currentTool].OnMouseUp(e.Location, drawer));
+            _mainPicture.MouseMove +=
+                (o, e) =>
+                    Draw(drawer =>
+                        _tools[_currentTool].OnMouseMove(e.Location, drawer));
+            Controls.Add(_mainPicture);
             
             MakeButtons();
         }
@@ -60,6 +56,7 @@ namespace GraphFunc
             _currentTool = -1;
             for (var i = 0; i < _tools.Count; i++)
             {
+                _tools[i].Init(_polygonContainer);
                 var button = new Button
                 {
                     BackColor = Color.White,
@@ -67,13 +64,12 @@ namespace GraphFunc
                     Height = 20,
                     Top = 10 + i / 5 * 30,
                     Left = 100 + i % 5 * 100,
-                    Text = _tools[i].Name(),
+                    Text = _tools[i].ToString(),
                 };
                 var j = i;
                 button.Click += (o, e) =>
                 {
-                    _tools[j].OnSelect(polygonContainer);
-                    DrawPolygons();
+                    Draw(drawer => _tools[j].OnSelect(drawer));
                     if (!_tools[j].CanUseInField())
                         return;
                     _toolButtons[_currentTool].BackColor = Color.White;
@@ -90,21 +86,11 @@ namespace GraphFunc
         
         private void Draw(Action<Graphics> draw)
         {
-            var image = new Bitmap(mainPicture.Width, mainPicture.Height);
+            var image = new Bitmap(_mainPicture.Width, _mainPicture.Height);
             var drawer = Graphics.FromImage(image);
             draw(drawer);
             drawer.Flush();
-            mainPicture.Image = image;
+            _mainPicture.Image = image;
         }
-
-        private void Clear()
-            => Draw(drawer => drawer.Clear(Color.White));
-        
-        private void DrawPolygons()
-            => Draw(drawer =>
-            {
-                Clear();
-                polygonContainer.Draw(drawer);
-            });
     }
 }

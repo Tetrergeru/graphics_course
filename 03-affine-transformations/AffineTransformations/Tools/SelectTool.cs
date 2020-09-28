@@ -22,10 +22,10 @@ namespace GraphFunc.Tools
             }
         }
         
-        public string Name()
-            => "Select";
-        
         public bool CanUseInField()
             => true;
+        
+        public override string ToString()
+            => "Select";
     }
 }

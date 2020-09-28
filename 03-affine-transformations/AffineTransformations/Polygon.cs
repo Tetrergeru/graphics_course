@@ -5,28 +5,30 @@ namespace GraphFunc
 {
     public class Polygon
     {
-        private readonly List<Point> points = new List<Point>();
+        private readonly List<Point> _points = new List<Point>();
 
-        public void AddPoint(Point point) 
-            => points.Add(point);
+        public IReadOnlyList<Point> Points => _points;
+
+        public void AddPoint(Point point)
+            => _points.Add(point);
 
         public void Draw(Graphics graphics, Color color)
         {
-            if (points.Count == 0)
+            if (_points.Count == 0)
                 return;
-            if (points.Count == 1)
-                DrawPoint(graphics, points[0], color);
+            if (_points.Count == 1)
+                DrawPoint(graphics, _points[0], color);
             else
-                graphics.DrawPolygon(new Pen(color), points.ToArray());
+                graphics.DrawPolygon(new Pen(color), _points.ToArray());
         }
 
         public bool HasPoint(Point p)
         {
             PointF a = new PointF(p.X, p.Y);
-            PointF edge_start = points[points.Count - 1];
+            PointF edge_start = _points[_points.Count - 1];
             PointF edge_fin;
             var parity = 0;
-            foreach (var point in points)
+            foreach (var point in _points)
             {
                 edge_fin = point;
                 var e = new Edge(edge_start, edge_fin);
@@ -38,8 +40,10 @@ namespace GraphFunc
                         parity = 1 - parity;
                         break;
                 }
+
                 edge_start = edge_fin;
             }
+
             return parity == 1;
         }
 
@@ -58,9 +62,12 @@ namespace GraphFunc
             // TODO
         }
 
-        private void DrawPoint(Graphics graphics, Point point, Color color)
-        {
-            graphics.FillEllipse(new SolidBrush(color), new Rectangle(point.X - 2, point.Y - 2, 4, 4));
-        }
+        public static void DrawPoint(Graphics graphics, Point point, Color color, int radius = 2)
+            => graphics.FillEllipse(new SolidBrush(color),
+                new Rectangle(
+                    point.X - radius,
+                    point.Y - radius,
+                    radius * 2,
+                    radius * 2));
     }
 }

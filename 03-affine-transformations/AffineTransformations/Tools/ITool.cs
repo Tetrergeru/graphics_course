@@ -9,8 +9,6 @@ namespace GraphFunc.Tools
         
         void OnUse(PolygonContainer polygonContainer, Point point);
 
-        string Name();
-
         bool CanUseInField();
     }
 }

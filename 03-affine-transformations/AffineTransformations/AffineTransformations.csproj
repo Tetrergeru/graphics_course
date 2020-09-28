@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DrawingTool\DrawingToolWrapper.cs" />
+    <Compile Include="DrawingTool\IDrawingTool.cs" />
+    <Compile Include="DrawingTool\LeftRightTool.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>

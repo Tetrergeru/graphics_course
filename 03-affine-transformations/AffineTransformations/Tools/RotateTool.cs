@@ -12,11 +12,11 @@ namespace GraphFunc.Tools
         public void OnUse(PolygonContainer polygonContainer, Point point)
         {
         }
-
-        public string Name()
-            => "Rotate";
-
+        
         public bool CanUseInField()
-            => false;
+            => true;
+        
+        public override string ToString()
+            => "Rotate";
     }
 }

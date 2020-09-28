@@ -13,10 +13,10 @@ namespace GraphFunc.Tools
             polygonContainer.AddPoint(point);
         }
 
-        public string Name()
-            => "Add vertex";
-
         public bool CanUseInField()
             => true;
+        
+        public override string ToString()
+            => "Add point";
     }
 }
