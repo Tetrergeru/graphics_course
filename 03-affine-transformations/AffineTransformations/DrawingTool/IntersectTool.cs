@@ -69,7 +69,7 @@ namespace GraphFunc.DrawingTool
         {
             foreach (var polygonEdge in _edges)
             {
-                var intersection = edge.Intersection(polygonEdge);
+                var intersection = polygonEdge.Intersection(edge);
                 if (intersection == null)
                     continue;
                 var intersect = (PointF) intersection;
