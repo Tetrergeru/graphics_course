@@ -84,24 +84,25 @@ namespace GraphFunc
             var (type, offset) = Cross(other);
             if (type != Line_Instance.SKEW_CROSS)
                 return null;
-            Console.WriteLine($"{offset}: ({_source.X + offset * (_dest.X - _source.X)}, {_source.Y + offset * (_dest.Y - _source.Y)}), ({_source.X}, {_source.Y})");
             var intersection = new PointF( _source.X + offset * (_dest.X - _source.X), _source.Y + offset * (_dest.Y - _source.Y));
             return intersection;
         }
 
         public (Line_Instance, float) Cross(Edge e)
         {
-            var (crossType, t) = Intersect(e);
+            var (crossType, t) = e.Intersect(this);
             if (crossType == Line_Instance.COLLINEAR || crossType == Line_Instance.PARALLEL)
                 return (crossType, t);
-            if (0.0 <= t && t <= 1.0)
-            {
-                return (Line_Instance.SKEW_CROSS, t);
-            }
-
-            return (Line_Instance.SKEW_NO_CROSS, t);
+            if (t < 0 || t > 1)
+                return (Line_Instance.SKEW_NO_CROSS, t);
+            
+            (_, t) = Intersect(e);
+            if (t < 0 || t > 1)
+                return (Line_Instance.SKEW_NO_CROSS, t);
+            
+            return (Line_Instance.SKEW_CROSS, t);
         }
-        
+
         public Edge_Instance edgeType(PointF a)
         {
             var v = _source;
