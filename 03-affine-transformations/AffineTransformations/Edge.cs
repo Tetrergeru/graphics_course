@@ -60,7 +60,7 @@ namespace GraphFunc
         public static float DotProduct(PointF a, PointF b)
             => a.X * b.X + a.Y * b.Y;
 
-        public Line_Instance Intersect(Edge e, ref float t)
+        public (Line_Instance, float) Intersect(Edge e)
         {
             var a = _source;
             var b = _dest;
@@ -72,24 +72,33 @@ namespace GraphFunc
             {
                 var aclass = Classify(_source);
                 if (aclass == Position.LEFT || aclass == Position.RIGHT)
-                    return Line_Instance.PARALLEL;
-                return Line_Instance.COLLINEAR;
+                    return (Line_Instance.PARALLEL, float.NaN);
+                return (Line_Instance.COLLINEAR, float.NaN);
             }
             var num = DotProduct(n, new PointF(a.X - c.X, a.Y - c.Y));
-            t = -num / denom;
-            return Line_Instance.SKEW;
+            return (Line_Instance.SKEW, -num / denom);
         }
-        
-        public Line_Instance Cross(Edge e, ref float t)
+
+        public PointF? Intersection(Edge other)
         {
-            var crossType = Intersect(e, ref t);
+            var (type, offset) = Cross(other);
+            if (type != Line_Instance.SKEW_CROSS)
+                return null;
+            var intersection = new PointF( offset * (_dest.X - _source.X), offset * (_dest.Y - _source.Y));
+            Console.WriteLine($"{intersection}");
+            return intersection;
+        }
+
+        public (Line_Instance, float) Cross(Edge e)
+        {
+            var (crossType, t) = Intersect(e);
             if (crossType == Line_Instance.COLLINEAR || crossType == Line_Instance.PARALLEL)
-                return crossType;
+                return (crossType, t);
             if (t < 0.0 || t > 1.0)
-                return Line_Instance.SKEW_NO_CROSS;
+                return (Line_Instance.SKEW_NO_CROSS, t);
             if (0.0 <= t && t <= 1.0)
-                return Line_Instance.SKEW_CROSS;
-            return Line_Instance.SKEW_NO_CROSS;
+                return (Line_Instance.SKEW_CROSS, t);
+            return (Line_Instance.SKEW_NO_CROSS, t);
         }
         
         public Edge_Instance edgeType(PointF a)
@@ -109,6 +118,21 @@ namespace GraphFunc
                 default:
                     return Edge_Instance.INESSENTIAL;
             }
+        }
+        
+        public static (Point, Point) InfiniteLine(Point p0, Point p1, Point size)
+        {
+            if (p1.X == p0.X)
+                return (new Point(p0.X, 0), new Point(p1.X, size.Y));
+            var a = (double) (p1.Y - p0.Y) / (p1.X - p0.X);
+            var b = p0.Y  - a * p0.X;
+            var from = b > 0 
+                ? new Point(0, (int)b)
+                : new Point((int)(-b/a), 0);
+            var to = a * size.X + b > size.Y
+                ? new Point((int) ((size.Y - b) / a), size.Y)
+                : new Point(size.X, (int) (a * size.X + b)); 
+            return (from, to);
         }
     }
 }

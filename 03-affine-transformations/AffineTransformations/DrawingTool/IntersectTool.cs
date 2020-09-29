@@ -1,15 +1,18 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Drawing;
+using GraphFunc.Tools;
 
 namespace GraphFunc.DrawingTool
 {
-    public class LeftRightTool : IDrawingTool
+    public class IntersectTool : IDrawingTool
     {
         private PolygonContainer _polygonContainer;
 
         private Point _from;
 
         private bool _mouseDown;
+
+        private List<Edge> _edges;
         
         public void Init(PolygonContainer polygonContainer)
         {
@@ -20,6 +23,11 @@ namespace GraphFunc.DrawingTool
         {
             _from = coordinates;
             _mouseDown = true;
+            _edges = new List<Edge>();
+            var points = _polygonContainer.Selected.Points;
+            for (var i = 1;i < points.Count;i ++)
+                _edges.Add(new Edge(points[i - 1], points[i]));
+            _edges.Add(new Edge(points[points.Count - 1], points[0]));
             _polygonContainer.Draw(drawer);
         }
 
@@ -37,24 +45,12 @@ namespace GraphFunc.DrawingTool
                 _polygonContainer.Draw(drawer);
                 return;
             }
-
+            
+            drawer.DrawLine(new Pen(Color.Cyan, 2), _from,  coordinates);
+            
             var edge = new Edge(new PointF(_from.X, _from.Y), new PointF(coordinates.X, coordinates.Y));
-            foreach (var polygon in _polygonContainer.Polygons)
-            foreach (var point in polygon.Points)
-            {
-                switch (edge.Classify(point))
-                {
-                    case Edge.Position.LEFT:
-                        Polygon.DrawPoint(drawer, point, Color.Red, 3);
-                        break;
-                    case Edge.Position.RIGHT:
-                        Polygon.DrawPoint(drawer, point, Color.Blue, 3);
-                        break;
-                }
-            }
-
-            var (from, to) = Edge.InfiniteLine(_from, coordinates, new Point(500, 500));
-            drawer.DrawLine(new Pen(Color.Cyan, 2), from,  to);
+            DrawIntersections(drawer, edge);
+            
             _polygonContainer.Draw(drawer);
         }
 
@@ -67,6 +63,18 @@ namespace GraphFunc.DrawingTool
             => true;
 
         public override string ToString()
-            => "Left/right";
+            => "Intersections";
+
+        private void DrawIntersections(Graphics drawer, Edge edge)
+        {
+            foreach (var polygonEdge in _edges)
+            {
+                var intersection = edge.Intersection(polygonEdge);
+                if (intersection == null)
+                    continue;
+                var intersect = (PointF) intersection;
+                Polygon.DrawPoint(drawer, new Point((int)intersect.X, (int)intersect.Y), Color.Red, 3);
+            }
+        }
     }
 }

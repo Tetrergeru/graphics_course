@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="DrawingTool\DrawingToolWrapper.cs" />
     <Compile Include="DrawingTool\IDrawingTool.cs" />
+    <Compile Include="DrawingTool\IntersectTool.cs" />
     <Compile Include="DrawingTool\LeftRightTool.cs" />
     <Compile Include="DrawingTool\ScaleCenterTool.cs" />
     <Compile Include="DrawingTool\ScaleTool.cs" />

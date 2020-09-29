@@ -25,6 +25,7 @@ namespace GraphFunc
                 new LeftRightTool(),
                 new ScaleTool(),
                 new ScaleCenterTool(),
+                new IntersectTool(),
             });
             Application.Run(form);
         }
