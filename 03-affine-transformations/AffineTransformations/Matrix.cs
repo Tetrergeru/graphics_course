@@ -14,8 +14,8 @@ namespace GraphFunc
 
         public PointF Multiply(PointF point)
             => new PointF(
-                point.X * this[0, 0] + point.Y * this[1, 0] + this[2, 0],
-                point.X * this[0, 1] + point.Y * this[1, 1] + this[2, 1]);
+                point.X * this[0, 0] + point.Y * this[0, 1] + this[0, 2],
+                point.X * this[1, 0] + point.Y * this[1, 1] + this[1, 2]);
 
     }
 }

@@ -24,6 +24,7 @@ namespace GraphFunc
                 new DrawingToolWrapper(new SelectTool()),
                 new LeftRightTool(),
                 new ScaleTool(),
+                new ScaleCenterTool(),
             });
             Application.Run(form);
         }

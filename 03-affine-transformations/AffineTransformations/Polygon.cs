@@ -71,18 +71,30 @@ namespace GraphFunc
             _points = _copy.ToList();
         }
 
+        public PointF Center()
+        {
+            var (x, y) = (0.0f, 0.0f);
+            foreach (var point in Points)
+            {
+                x += point.X;
+                y += point.Y;
+            }
+            return new PointF(x / Points.Count, y / Points.Count);
+        }
+
         public void Scale(PointF origin, (double w, double h) scale)
         {
+            var (w, h) = scale;
             var matrix = new Matrix
             {
-                [0, 0] = (float) scale.w,
-                [1, 1] = (float) scale.h,
+                [0, 0] = (float) w,
+                [1, 1] = (float) h,
                 [2, 2] = 1,
+                [0, 2] = (float) ((1 - w) * origin.X),
+                [1, 2] = (float) ((1 - h) * origin.Y),
             };
             for (var i = 0; i < _points.Count; i++)
-            {
                 _points[i] = matrix.Multiply(_points[i]).ToPoint();
-            }
         }
 
         public static void DrawPoint(Graphics graphics, Point point, Color color, int radius = 2)

@@ -5,9 +5,9 @@ namespace GraphFunc.DrawingTool
 {
     public class ScaleTool : IDrawingTool
     {
-        private PolygonContainer _polygonContainer;
+        protected PolygonContainer _polygonContainer;
         
-        private Point _from;
+        protected Point _from;
 
         private bool _mouseDown;
         
@@ -16,7 +16,7 @@ namespace GraphFunc.DrawingTool
             _polygonContainer = polygonContainer;
         }
 
-        public void OnMouseDown(Point coordinates, Graphics drawer)
+        public virtual void OnMouseDown(Point coordinates, Graphics drawer)
         {
             _from = coordinates;
             _mouseDown = true;
@@ -41,15 +41,22 @@ namespace GraphFunc.DrawingTool
 
             const int factor = 100;
             _polygonContainer.Selected.Load();
-            _polygonContainer.Selected.Scale(_from,(
-                    (coordinates.X - _from.X + factor) / (factor * 1.0),
-                    (coordinates.Y - _from.Y + factor) / (factor * 1.0)));
+            var origin = new Point(_from.X - factor, _from.Y - factor);
+            var scale = (
+                (coordinates.X - origin.X) / (factor * 1.0),
+                (coordinates.Y - origin.Y) / (factor * 1.0));
 
-            var origin = new Point(_from.X + factor, _from.Y + factor);
+            Scale(scale);
+            
             Polygon.DrawPoint(drawer, origin, Color.Green);
             drawer.DrawLine(new Pen(Color.Cyan), origin, coordinates);
             drawer.DrawRectangle(new Pen(Color.Cyan), new Rectangle(origin.X - factor, origin.Y - factor, factor * 2, factor * 2));
             _polygonContainer.Draw(drawer);
+        }
+
+        protected virtual void Scale((double w, double h) scale)
+        {
+            _polygonContainer.Selected.Scale(_from, scale);
         }
 
         public void OnSelect(Graphics drawer)
