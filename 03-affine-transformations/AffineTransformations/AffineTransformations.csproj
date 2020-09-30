@@ -52,6 +52,7 @@
     <Compile Include="DrawingTool\IntersectTool.cs" />
     <Compile Include="DrawingTool\LeftRightTool.cs" />
     <Compile Include="DrawingTool\MoveTool.cs" />
+    <Compile Include="DrawingTool\RotateCenterTool.cs" />
     <Compile Include="DrawingTool\RotateTool.cs" />
     <Compile Include="DrawingTool\ScaleCenterTool.cs" />
     <Compile Include="DrawingTool\ScaleTool.cs" />

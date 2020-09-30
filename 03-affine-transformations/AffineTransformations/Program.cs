@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using GraphFunc.DrawingTool;
 using GraphFunc.Tools;
@@ -23,13 +22,12 @@ namespace GraphFunc
                 new DrawingToolWrapper(new AddPointTool()),
                 new DrawingToolWrapper(new SelectTool()),
                 new LeftRightTool(),
+                new IntersectTool(),
                 new ScaleTool(),
                 new ScaleCenterTool(),
-                new IntersectTool(),
-                new DrawingToolWrapper(new RotateTool()),
-                new DrawingToolWrapper(new MoveTool()),
-                new RotateTool(),
-                new MoveTool(),
+                new DrawingTool.RotateTool(),
+                new RotateCenterTool(),
+                new DrawingTool.MoveTool(),
             });
             Application.Run(form);
         }

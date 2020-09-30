@@ -39,16 +39,14 @@ namespace GraphFunc.DrawingTool
                 return;
             }
 
-            const int factor = 1;
             _polygonContainer.Selected.Load();
-            var origin = new Point(_from.X - factor, _from.Y - factor);
-            var angle = ((coordinates.X - origin.X) + (coordinates.Y - origin.Y)) / 2.0;
+            var angle = Math.Atan((double)(coordinates.X - _from.X) / (coordinates.Y - _from.Y));
+            Console.WriteLine($"{angle}");
+            
+            Rotate(angle / Math.PI * 360);
 
-            Rotate(angle);
-
-            Polygon.DrawPoint(drawer, origin, Color.Green);
-            drawer.DrawLine(new Pen(Color.Cyan), origin, coordinates);
-            drawer.DrawRectangle(new Pen(Color.Cyan), new Rectangle(origin.X - factor, origin.Y - factor, factor * 2, factor * 2));
+            Polygon.DrawPoint(drawer, _from, Color.Green);
+            drawer.DrawLine(new Pen(Color.Cyan), _from, coordinates);
             _polygonContainer.Draw(drawer);
         }
 

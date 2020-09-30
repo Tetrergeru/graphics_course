@@ -61,8 +61,8 @@ namespace GraphFunc
                 [2, 2] = 1,
                 [0, 1] = -(float)Math.Sin(angle),
                 [1, 0] = (float)Math.Sin(angle),
-                [0, 2] = (float)(origin.X * Math.Cos(angle) - origin.Y * Math.Sin(angle)),
-                [1, 2] = (float)(origin.X * Math.Sin(angle) + origin.Y * Math.Cos(angle))
+                [0, 2] = (float)(-origin.X * Math.Cos(angle) + origin.Y * Math.Sin(angle) + origin.X),
+                [1, 2] = (float)(-origin.X * Math.Sin(angle) - origin.Y * Math.Cos(angle) + origin.Y),
             };
             for (var i = 0; i < _points.Count; i++)
                 _points[i] = matrix.Multiply(_points[i]).ToPoint();
