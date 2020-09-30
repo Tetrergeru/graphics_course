@@ -26,6 +26,8 @@ namespace GraphFunc
                 new ScaleTool(),
                 new ScaleCenterTool(),
                 new IntersectTool(),
+                new DrawingToolWrapper(new RotateTool()),
+                new DrawingToolWrapper(new MoveTool()),
             });
             Application.Run(form);
         }
