@@ -28,6 +28,8 @@ namespace GraphFunc
                 new IntersectTool(),
                 new DrawingToolWrapper(new RotateTool()),
                 new DrawingToolWrapper(new MoveTool()),
+                new RotateTool(),
+                new MoveTool(),
             });
             Application.Run(form);
         }
