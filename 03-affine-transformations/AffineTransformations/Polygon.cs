@@ -28,6 +28,8 @@ namespace GraphFunc
 
         public bool HasPoint(Point p)
         {
+            if (_points.Count == 0)
+                return false;
             PointF a = new PointF(p.X, p.Y);
             PointF edge_start = _points[_points.Count - 1];
             PointF edge_fin;
@@ -53,6 +55,8 @@ namespace GraphFunc
 
         public void Rotate(PointF origin, double angle)
         {
+            if (_points.Count == 0)
+                return;
             angle = (float)(angle / 180 * Math.PI);
             var matrix = new Matrix
             {
@@ -70,6 +74,8 @@ namespace GraphFunc
 
         public void Move(PointF delta)
         {
+            if (_points.Count == 0)
+                return;
             var matrix = new Matrix
             {
                 [0, 0] = 1,
@@ -105,6 +111,8 @@ namespace GraphFunc
 
         public void Scale(PointF origin, (double w, double h) scale)
         {
+            if (_points.Count == 0)
+                return;
             var (w, h) = scale;
             var matrix = new Matrix
             {
