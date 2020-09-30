@@ -51,6 +51,8 @@
     <Compile Include="DrawingTool\IDrawingTool.cs" />
     <Compile Include="DrawingTool\IntersectTool.cs" />
     <Compile Include="DrawingTool\LeftRightTool.cs" />
+    <Compile Include="DrawingTool\MoveTool.cs" />
+    <Compile Include="DrawingTool\RotateTool.cs" />
     <Compile Include="DrawingTool\ScaleCenterTool.cs" />
     <Compile Include="DrawingTool\ScaleTool.cs" />
     <Compile Include="Edge.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="Tools\ClearTool.cs" />
     <Compile Include="Tools\DeleteTool.cs" />
     <Compile Include="Tools\ITool.cs" />
-    <Compile Include="Tools\RotateTool.cs" />
     <Compile Include="Tools\SelectTool.cs" />
   </ItemGroup>
   <ItemGroup>

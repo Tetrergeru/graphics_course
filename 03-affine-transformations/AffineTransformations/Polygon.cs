@@ -53,12 +53,33 @@ namespace GraphFunc
 
         public void Rotate(PointF origin, double angle)
         {
-            // TODO
+            angle = (float)(angle / 180 * Math.PI);
+            var matrix = new Matrix
+            {
+                [0, 0] = (float)Math.Cos(angle),
+                [1, 1] = (float)Math.Cos(angle),
+                [2, 2] = 1,
+                [0, 1] = -(float)Math.Sin(angle),
+                [1, 0] = (float)Math.Sin(angle),
+                [0, 2] = (float)(origin.X * Math.Cos(angle) - origin.Y * Math.Sin(angle)),
+                [1, 2] = (float)(origin.X * Math.Sin(angle) + origin.Y * Math.Cos(angle))
+            };
+            for (var i = 0; i < _points.Count; i++)
+                _points[i] = matrix.Multiply(_points[i]).ToPoint();
         }
 
         public void Move(PointF delta)
         {
-            // TODO
+            var matrix = new Matrix
+            {
+                [0, 0] = 1,
+                [1, 1] = 1,
+                [2, 2] = 1,
+                [0, 2] = delta.X,
+                [1, 2] = delta.Y
+            };
+            for (var i = 0; i < _points.Count; i++)
+                _points[i] = matrix.Multiply(_points[i]).ToPoint();
         }
 
         public void Save()
