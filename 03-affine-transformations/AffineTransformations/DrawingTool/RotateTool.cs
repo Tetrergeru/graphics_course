@@ -41,7 +41,6 @@ namespace GraphFunc.DrawingTool
 
             _polygonContainer.Selected.Load();
             var angle = Math.Atan((double)(coordinates.X - _from.X) / (coordinates.Y - _from.Y));
-            Console.WriteLine($"{angle}");
             
             Rotate(angle / Math.PI * 360);
 
