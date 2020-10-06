@@ -30,7 +30,15 @@ namespace GraphFunc
         {
             return Math.Sqrt(p.X * p.X + p.Y * p.Y);
         }
-        
+
+        public double DistanceTo(PointF point)
+        {
+            var a = 1 / (_dest.X - _source.X);
+            var b = -1/(_dest.Y - _source.Y);
+            var c = _source.Y / (_dest.Y - _source.Y) - _source.X / (_dest.X - _source.X);
+            return (a * point.X + b * point.Y + c) / Math.Sqrt(a * a + b * b);
+        }
+
         public enum Position {LEFT, RIGHT, BEYOND, BEHIND, BETWEEN, ORIGIN, DESTINATION }
         
         public enum Line_Instance { COLLINEAR, PARALLEL, SKEW, SKEW_CROSS, SKEW_NO_CROSS }

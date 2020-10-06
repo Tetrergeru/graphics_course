@@ -133,5 +133,19 @@ namespace GraphFunc
                     point.Y - radius,
                     radius * 2,
                     radius * 2));
+
+        public PointNode ToLinkedList()
+        {
+            if (_points.Count == 0)
+                return null;
+            var list = _points.Select(p => new PointNode { Point = p }).ToList();
+            for (var i = 0; i < _points.Count; i++)
+            {
+                list[i].Next = list[(i + 1) % _points.Count];
+                list[i].Prev = list[(i + _points.Count - 1) % _points.Count];
+            }
+
+            return list[0];
+        }
     }
 }

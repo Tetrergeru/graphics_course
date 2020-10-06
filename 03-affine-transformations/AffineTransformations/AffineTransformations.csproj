@@ -61,6 +61,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Matrix.cs" />
+    <Compile Include="PointNode.cs" />
     <Compile Include="Polygon.cs" />
     <Compile Include="PolygonContainer.cs" />
     <Compile Include="Program.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Tools\MoveTool.cs" />
     <Compile Include="Tools\RotateTool.cs" />
     <Compile Include="Tools\SelectTool.cs" />
+    <Compile Include="Tools\TriangulateTool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

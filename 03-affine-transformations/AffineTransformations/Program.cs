@@ -28,7 +28,7 @@ namespace GraphFunc
                 new DrawingTool.RotateTool(),
                 new RotateCenterTool(),
                 new DrawingTool.MoveTool(),
-                new DrawingToolWrapper(new DeleteTool()),
+                new DrawingToolWrapper(new TriangulateTool()),
             });
             Application.Run(form);
         }

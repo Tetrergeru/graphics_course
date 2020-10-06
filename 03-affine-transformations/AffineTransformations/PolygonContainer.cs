@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace GraphFunc
@@ -59,5 +60,50 @@ namespace GraphFunc
             for (var i = 0; i < _polygons.Count; i++)
                 _polygons[i].Draw(graphics, i == _selectedPolygon ? Color.Red : Color.Black);
         }
+
+        public void TriangulateSelected()
+        {
+            if (_selectedPolygon < 0)
+                return;
+            if (Selected.Points.Count < 3)
+                return;
+            Triangulate(Selected.ToLinkedList());
+        }
+
+        private void Triangle(Point a, Point b, Point c)
+        {
+            _polygons.Add(new Polygon());
+            _polygons[_polygons.Count - 1].AddPoint(a);
+            _polygons[_polygons.Count - 1].AddPoint(b);
+            _polygons[_polygons.Count - 1].AddPoint(c);
+        }
+
+        private void AddList(PointNode polygon)
+        {
+            _polygons.Add(new Polygon());
+            _polygons[_polygons.Count - 1].AddPoint(polygon.Point);
+            for (var next = polygon.Prev; next != polygon; next = next.Prev)
+                _polygons[_polygons.Count - 1].AddPoint(next.Point);
+        }
+
+        private void Triangulate(PointNode polygon)
+        {
+            if (polygon.Next == polygon)
+                return;
+            var internalPoint = polygon.FindInternalPoint();
+            if (internalPoint == null)
+            {
+                Triangle(polygon.Point, polygon.Next.Point, polygon.Prev.Point);
+                polygon.Delete();
+                Triangulate(polygon.Next);
+            }
+            else
+            {
+                var (pointForPrev, pointForNext) = polygon.DivideBy(internalPoint);
+                Triangulate(pointForNext);
+                Triangulate(pointForPrev);
+            }
+        }
+        
     }
 }
