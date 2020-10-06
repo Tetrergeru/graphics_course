@@ -9,6 +9,7 @@ namespace GraphFunc.Tools
     public class LineTool : ITool
     {
         private readonly bool Wu;
+        
         public LineTool(bool wu)
         {
             Wu = wu;

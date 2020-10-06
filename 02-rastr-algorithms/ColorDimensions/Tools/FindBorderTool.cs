@@ -39,9 +39,7 @@ namespace GraphFunc.Tools
                     throw new Exception("wtf?");
             }
         }
-
-
-
+        
         private List<Tuple<int, int>> findBorders(Bitmap image, int x, int y)
         {
             List<Tuple<int, int>> points = new List<Tuple<int, int>>();
