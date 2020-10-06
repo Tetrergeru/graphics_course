@@ -134,6 +134,25 @@ namespace GraphFunc
                     radius * 2,
                     radius * 2));
 
+        private bool RightArrow()
+        {
+            var imax = -1;
+            var i = 0;
+            var vmax = float.MinValue;
+            foreach (var point in _points)
+            {
+                if (point.Y > vmax)
+                {
+                    imax = i;
+                    vmax = point.Y;
+                }
+
+                i++;
+            }
+
+            return _points[imax].X > _points[(imax + 1) % _points.Count].X;
+        }
+
         public PointNode ToLinkedList()
         {
             if (_points.Count == 0)

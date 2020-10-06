@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace GraphFunc
 {
@@ -17,27 +18,27 @@ namespace GraphFunc
         public PointNode FindInternalPoint()
         {
             var edge = new Edge(Prev.Point, Next.Point);
+            var right = new Edge(Point, Next.Point);
+            var left = new Edge(Prev.Point, Point);
             var current = Prev.Prev;
             
             PointNode chosen = null;
-            var max = double.MinValue;
+            var min = double.MaxValue;
 
             for (; current != Next; current = current.Prev)
             {
                 var distance = edge.DistanceTo(current.Point);
-                if (distance > max)
+                if (edge.Classify(current.Point) == Edge.Position.RIGHT 
+                    && right.Classify(current.Point) == Edge.Position.LEFT
+                    && left.Classify(current.Point) == Edge.Position.RIGHT
+                    && distance < min)
                 {
-                    max = distance;
+                    min = distance;
                     chosen = current;
                 }
             }
 
-            if (chosen == null)
-                return null;
-            
-            return edge.DistanceTo(chosen.Point) > 0 
-                ? chosen 
-                : null;
+            return chosen;
         }
         
         public (PointNode, PointNode) DivideBy(PointNode internalPoint)
@@ -63,6 +64,18 @@ namespace GraphFunc
             pointForNext.Prev = internalForNext;
 
             return (pointForPrev, pointForNext);
+        }
+
+        public PointNode SelectFirst()
+        {
+            var polygon = this;
+            while (true)
+            {
+                var edge = new Edge(polygon.Prev.Point, polygon.Next.Point);
+                if (edge.Classify(Point) == Edge.Position.RIGHT)
+                    return polygon;
+                polygon = polygon.Next;
+            }
         }
     }
 }

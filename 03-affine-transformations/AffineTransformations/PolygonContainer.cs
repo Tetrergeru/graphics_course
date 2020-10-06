@@ -67,7 +67,8 @@ namespace GraphFunc
                 return;
             if (Selected.Points.Count < 3)
                 return;
-            Triangulate(Selected.ToLinkedList());
+            var list = Selected.ToLinkedList().SelectFirst();
+            Triangulate(list);
         }
 
         private void AddPolygon(params PointF[] points)
@@ -87,17 +88,19 @@ namespace GraphFunc
 
         private void Triangulate(PointNode polygon)
         {
-            if (polygon.Next == polygon)
+            if (polygon.Next == polygon || polygon.Prev == polygon.Next)
                 return;
             var internalPoint = polygon.FindInternalPoint();
             if (internalPoint == null)
             {
+                Console.WriteLine($"{polygon.Point} {polygon.Next.Point} {polygon.Prev.Point}");
                 AddPolygon(polygon.Point, polygon.Next.Point, polygon.Prev.Point);
                 polygon.Delete();
                 Triangulate(polygon.Next);
             }
             else
             {
+                Console.WriteLine($"{polygon.Point} {internalPoint.Point}");
                 var (pointForPrev, pointForNext) = polygon.DivideBy(internalPoint);
                 Triangulate(pointForNext);
                 Triangulate(pointForPrev);
