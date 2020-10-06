@@ -45,10 +45,10 @@ namespace GraphFunc.DrawingTool
                 switch (edge.Classify(point))
                 {
                     case Edge.Position.LEFT:
-                        Polygon.DrawPoint(drawer, point, Color.Red, 3);
+                        Polygon.DrawPoint(drawer, point.ToPoint(), Color.Red, 3);
                         break;
                     case Edge.Position.RIGHT:
-                        Polygon.DrawPoint(drawer, point, Color.Blue, 3);
+                        Polygon.DrawPoint(drawer, point.ToPoint(), Color.Blue, 3);
                         break;
                 }
             }

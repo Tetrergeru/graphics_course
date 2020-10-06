@@ -70,12 +70,11 @@ namespace GraphFunc
             Triangulate(Selected.ToLinkedList());
         }
 
-        private void Triangle(Point a, Point b, Point c)
+        private void AddPolygon(params PointF[] points)
         {
             _polygons.Add(new Polygon());
-            _polygons[_polygons.Count - 1].AddPoint(a);
-            _polygons[_polygons.Count - 1].AddPoint(b);
-            _polygons[_polygons.Count - 1].AddPoint(c);
+            foreach (var point in points)
+                _polygons[_polygons.Count - 1].AddPoint(point);
         }
 
         private void AddList(PointNode polygon)
@@ -93,7 +92,7 @@ namespace GraphFunc
             var internalPoint = polygon.FindInternalPoint();
             if (internalPoint == null)
             {
-                Triangle(polygon.Point, polygon.Next.Point, polygon.Prev.Point);
+                AddPolygon(polygon.Point, polygon.Next.Point, polygon.Prev.Point);
                 polygon.Delete();
                 Triangulate(polygon.Next);
             }

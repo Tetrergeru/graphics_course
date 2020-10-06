@@ -4,7 +4,7 @@ namespace GraphFunc
 {
     public class PointNode
     {
-        public Point Point;
+        public PointF Point;
         
         public PointNode Prev, Next;
 

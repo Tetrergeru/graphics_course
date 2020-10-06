@@ -7,13 +7,13 @@ namespace GraphFunc
 {
     public class Polygon
     {
-        private List<Point> _points = new List<Point>();
+        private List<PointF> _points = new List<PointF>();
 
-        private List<Point> _copy;
+        private List<PointF> _copy;
         
-        public IReadOnlyList<Point> Points => _points;
+        public IReadOnlyList<PointF> Points => _points;
 
-        public void AddPoint(Point point)
+        public void AddPoint(PointF point)
             => _points.Add(point);
 
         public void Draw(Graphics graphics, Color color)
@@ -21,7 +21,7 @@ namespace GraphFunc
             if (_points.Count == 0)
                 return;
             if (_points.Count == 1)
-                DrawPoint(graphics, _points[0], color);
+                DrawPoint(graphics, _points[0].ToPoint(), color);
             else
                 graphics.DrawPolygon(new Pen(color), _points.ToArray());
         }
