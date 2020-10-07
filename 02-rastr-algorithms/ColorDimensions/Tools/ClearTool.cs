@@ -10,6 +10,7 @@ namespace GraphFunc.Tools
 
         public void Draw(Bitmap image, Point coords, Color color)
         {
+            Globals.POINTLIST = new System.Collections.Generic.LinkedList<Point>();
             using (var drawer = Graphics.FromImage(image))
                 drawer.Clear(color);
         }
