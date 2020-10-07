@@ -39,6 +39,8 @@ namespace GraphFunc
                 new LineTool(true),
                 new LineTool(false),
                 new FindBorderTool(),
+                new DrawPointTool(),
+                new GrahamTool(),
             });
             Application.Run(_form);
         }
