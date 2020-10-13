@@ -17,6 +17,7 @@ namespace GraphFunc
             var form = new Form(new List<ITool>
             {
                 new MidpointTool(),
+                new BezierTool(),
             });
             Application.Run(form);
         }

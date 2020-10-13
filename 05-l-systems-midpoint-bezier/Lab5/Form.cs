@@ -45,8 +45,8 @@ namespace GraphFunc
                     BackColor = Color.White,
                     Width = 150,
                     Height = 20,
-                    Top = 10 + i * 30,
-                    Left = 30 + i * 100,
+                    Top = 10,
+                    Left = 30 + i * 160,
                     Text = _tools[i].ToString(),
                 };
                 var j = i;
