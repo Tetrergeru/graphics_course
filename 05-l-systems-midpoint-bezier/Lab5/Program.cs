@@ -18,6 +18,7 @@ namespace GraphFunc
             {
                 new MidpointTool(),
                 new BezierTool(),
+                new FractalTool(),
             });
             Application.Run(form);
         }
