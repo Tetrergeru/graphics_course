@@ -38,6 +38,7 @@ namespace GraphFunc
                     Width = Width - 50,
                     Height = Height - 100,
                     Top = 45,
+                    Visible = i == 0,
                 };
                 _tools[i].Add(panel);
                 var button = new Button
