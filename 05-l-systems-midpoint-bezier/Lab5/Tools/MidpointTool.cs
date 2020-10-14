@@ -60,17 +60,17 @@ namespace GraphFunc.Tools
             panel.Controls.Add(iterationsLabel);
             var iterations = new HScrollBar
             {
-                Minimum = 10,
-                Maximum = 150,
+                Minimum = 1,
+                Maximum = 15 + 9,
                 Left = 100,
                 Top = panel.Height - BottomSpace + 10,
                 Height = 15,
                 Width = 150,
-                Value = _desiredDepth * 10,
+                Value = _desiredDepth,
             };
             iterations.Scroll += (sender, args) =>
             {
-                _desiredDepth = args.NewValue/10;
+                _desiredDepth = args.NewValue;
                 iterationsLabel.Text = $"Iterations: {_desiredDepth}";
                 MidpointDraw();
             };
@@ -86,7 +86,7 @@ namespace GraphFunc.Tools
             var from = new HScrollBar
             {
                 Minimum = 50,
-                Maximum = 300,
+                Maximum = 500,
                 Left = 450,
                 Top = panel.Height - BottomSpace + 10,
                 Height = 15,
@@ -111,7 +111,7 @@ namespace GraphFunc.Tools
             var to = new HScrollBar
             {
                 Minimum = 1,
-                Maximum = 50,
+                Maximum = 70,
                 Left = 450,
                 Top = panel.Height - BottomSpace + 35,
                 Height = 15,

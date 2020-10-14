@@ -52,17 +52,17 @@ namespace GraphFunc.Tools
             panel.Controls.Add(depthLabel);
             var depth = new HScrollBar
             {
-                Minimum = 10,
-                Maximum = 150,
+                Minimum = 1,
+                Maximum = 15 + 9,
                 Left = 100,
                 Top = panel.Height - BottomSpace + 10,
                 Height = 15,
                 Width = 150,
-                Value = _desiredDepth * 10,
+                Value = _desiredDepth,
             };
             depth.Scroll += (sender, args) =>
             {
-                _desiredDepth = args.NewValue / 10;
+                _desiredDepth = args.NewValue;
                 depthLabel.Text = $"Depth: {_desiredDepth}";
                 parseFile();
             };
@@ -80,8 +80,9 @@ namespace GraphFunc.Tools
             fileLoad.Click += (sender, args) =>
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "TXT files (*.txt)|*.txt"; if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                _fname = openFileDialog.FileName;
+                openFileDialog.Filter = "TXT files (*.txt)|*.txt";
+                if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    _fname = openFileDialog.FileName;
                 parseFile();
             };
 
