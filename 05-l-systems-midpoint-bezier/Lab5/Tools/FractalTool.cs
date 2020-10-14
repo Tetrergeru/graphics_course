@@ -12,11 +12,13 @@ namespace GraphFunc.Tools
     {
         private PictureBox _picture = new PictureBox();
 
-        private int _drawDepth = 5;
+        private int _desiredDepth = 1;
 
         private Graphics _drawer;
 
-        private Button _drawButton;
+        private string _fname = "";
+
+        private const int BottomSpace = 50;
 
         public void Add(Panel panel)
         {
@@ -24,32 +26,69 @@ namespace GraphFunc.Tools
             _picture = new PictureBox
             {
                 Width = panel.Width,
-                Height = panel.Height - 60,
+                Height = panel.Height - BottomSpace,
                 Top = 5,
                 Left = 5,
                 Image = new Bitmap(panel.Width, panel.Height),
             };
             panel.Controls.Add(_picture);
 
-            AddButtons(panel);
-            parseFile("todo");
+            AddSettings(panel);
+
+            parseFile();
         }
 
-        private void AddButtons(Panel panel)
+
+        private void AddSettings(Panel panel)
         {
-            _drawButton = new Button
+            var depthLabel = new Label
             {
-                BackColor = Color.White,
-                Width = 150,
-                Height = 20,
-                Top = panel.Height - 40,
-                Left = 30,
-                Text = "Draw!",
+                Text = $"Depth: {_desiredDepth}",
+                Left = 0,
+                Top = panel.Height - BottomSpace + 10,
             };
+            panel.Controls.Add(depthLabel);
+            var depth = new HScrollBar
+            {
+                Minimum = 10,
+                Maximum = 150,
+                Left = 100,
+                Top = panel.Height - BottomSpace + 10,
+                Height = 15,
+                Width = 150,
+                Value = _desiredDepth * 10,
+            };
+            depth.Scroll += (sender, args) =>
+            {
+                _desiredDepth = args.NewValue / 10;
+                depthLabel.Text = $"Depth: {_desiredDepth}";
+                parseFile();
+            };
+            panel.Controls.Add(depth);
+
+            var fileLoad = new Button
+            {
+                Left = 320,
+                Top = panel.Height - BottomSpace + 10,
+                Text = "New file",
+                Width = 150,
+                Height = 25,
+
+            };
+            fileLoad.Click += (sender, args) =>
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "TXT files (*.txt)|*.txt"; if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                _fname = openFileDialog.FileName;
+                parseFile();
+            };
+
+            panel.Controls.Add(fileLoad);
         }
 
-            public void FractalDraw(string state, double angle, string direction)
+        public void FractalDraw(string state, double angle, string direction)
         {
+
             List<Point> points = new List<Point>();
 
             int length = 100;
@@ -150,19 +189,20 @@ namespace GraphFunc.Tools
             }
 
             Pen pen = new Pen(Color.Red, 2);
-            _drawer = Graphics.FromImage(_picture.Image);
+            var picture = new Bitmap(_picture.Image);
+            _drawer = Graphics.FromImage(picture);
+            _drawer.Clear(Color.White);
+            _picture.Image = picture;
             for (int i = 0; i < new_points.Count() - 1; ++i)
                 _drawer.DrawLine(pen, new_points[i], new_points[i + 1]);
         }
 
-        public void parseFile(string fname)
+        public void parseFile()
         {
-            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\SquareKohIsland.txt");
-            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\mozaik.txt");
-            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\bush.txt");
-            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\KohCurve.txt");
-            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\GosperCurve.txt");
-            System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\DragonCurve.txt");
+            if (_fname.Length == 0)
+                return;
+            System.IO.StreamReader sr = new System.IO.StreamReader(_fname);        
+
             Dictionary<char, string> rules = new Dictionary<char, string>();
 
             string[] strs = sr.ReadLine().Split(' ');
@@ -178,7 +218,7 @@ namespace GraphFunc.Tools
             }
             sr.Close();
 
-            for (int i = 0; i < _drawDepth; i++)
+            for (int i = 0; i < _desiredDepth; i++)
             {
                 string next_state = "";
                 foreach (var c in current_state)
