@@ -20,6 +20,8 @@ namespace GraphFunc.Tools
 
         private const int BottomSpace = 50;
 
+        private Random rand = new Random();
+
         public void Add(Panel panel)
         {
 
@@ -86,7 +88,7 @@ namespace GraphFunc.Tools
             panel.Controls.Add(fileLoad);
         }
 
-        public void FractalDraw(string state, double angle, string direction)
+        public void FractalDraw(string state, (double, double) angle, string direction)
         {
 
             List<Point> points = new List<Point>();
@@ -144,10 +146,11 @@ namespace GraphFunc.Tools
                     points.Add(current_point);
                     branches[branches.Count() - 1].Push(current_point);
                 }
+                
                 else if (c == '-')
-                    current_angle -= angle;
+                    current_angle -= angle.Item1 + rand.NextDouble() * (angle.Item2 - angle.Item1);
                 else if (c == '+')
-                    current_angle += angle;
+                    current_angle += angle.Item1 + rand.NextDouble() * (angle.Item2 - angle.Item1);
             }
 
             int x_min = int.MaxValue;
@@ -207,8 +210,8 @@ namespace GraphFunc.Tools
 
             string[] strs = sr.ReadLine().Split(' ');
             string current_state = strs[0];
-            double angle = double.Parse(strs[1]);
-            string direction = strs[2];
+            (double, double) angle = (double.Parse(strs[1]), double.Parse(strs[2]));
+            string direction = strs[3];
 
             while (!sr.EndOfStream)
             {
@@ -231,7 +234,7 @@ namespace GraphFunc.Tools
                 current_state = next_state;
             }
 
-            Console.WriteLine(current_state);
+            //Console.WriteLine(current_state);
             FractalDraw(current_state, angle, direction);
         }
     

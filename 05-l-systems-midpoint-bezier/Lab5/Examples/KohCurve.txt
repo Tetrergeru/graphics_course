@@ -1,2 +1,2 @@
-F 60 right
+F 60 60 right
 F F-F++F-F
