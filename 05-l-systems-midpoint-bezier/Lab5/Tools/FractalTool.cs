@@ -160,7 +160,9 @@ namespace GraphFunc.Tools
             //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\SquareKohIsland.txt");
             //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\mozaik.txt");
             //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\bush.txt");
-            System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\KohCurve.txt");
+            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\KohCurve.txt");
+            //System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\GosperCurve.txt");
+            System.IO.StreamReader sr = new System.IO.StreamReader("C:\\Users\\d\\Desktop\\4 курс\\CG\\graphics_course\\05-l-systems-midpoint-bezier\\Lab5\\Examples\\DragonCurve.txt");
             Dictionary<char, string> rules = new Dictionary<char, string>();
 
             string[] strs = sr.ReadLine().Split(' ');
