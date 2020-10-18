@@ -64,12 +64,16 @@
     <Compile Include="Projections\IProjection.cs" />
     <Compile Include="Projections\ProjectionIsometric.cs" />
     <Compile Include="Projections\ProjectionOrthographic.cs" />
+    <Compile Include="Projections\ProjectionPerspective.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Models\Cube.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Models\Skull.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

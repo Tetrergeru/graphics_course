@@ -11,7 +11,7 @@ namespace GraphFunc.Projections
             .Rotate(Axis.X, Math.PI/2 + Math.PI/12)
             .Rotate(Axis.Y, -Math.PI/12)
             .Set(0, 2, 0)
-            .Set(2, 2, 0)
+            .ClearAxis(Axis.Z)
             ;
         
         public PointF Project(Point3 point)

@@ -13,8 +13,8 @@ namespace GraphFunc.Projections
         {
             _projectionMatrix = Matrix3d
                 .One
-                //.ClearAxis(ignoredAxis)
-                .Rotate(ignoredAxis, Math.PI / 2);
+                .Rotate(ignoredAxis, Math.PI / 2)
+                ;
         }
 
         public PointF Project(Point3 point)
