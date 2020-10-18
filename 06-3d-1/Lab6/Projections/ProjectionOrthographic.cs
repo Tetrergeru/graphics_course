@@ -7,20 +7,20 @@ namespace GraphFunc.Projections
 {
     public class ProjectionOrthographic : IProjection
     {
-        private Func<Point3, PointF> _projector;
-        
+        private readonly Matrix3d _projectionMatrix;
+
         public ProjectionOrthographic(Axis ignoredAxis)
         {
-            _projector = ignoredAxis switch
-            {
-                Axis.X => p3 => new PointF(p3.Y, p3.Z),
-                Axis.Y => p3 => new PointF(p3.X, p3.Z),
-                Axis.Z => p3 => new PointF(p3.X, p3.Y),
-                _ => throw new ArgumentException($"Invalid value of Axis: {ignoredAxis}"),
-            };
+            _projectionMatrix = Matrix3d
+                .One
+                //.ClearAxis(ignoredAxis)
+                .Rotate(ignoredAxis, Math.PI / 2);
         }
 
         public PointF Project(Point3 point)
-            => _projector(point);
+        {
+            var point3 = _projectionMatrix.Multiply(point);
+            return new PointF(point3.X, point3.Y);
+        }
     }
 }

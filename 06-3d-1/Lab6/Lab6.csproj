@@ -62,6 +62,7 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projections\IProjection.cs" />
+    <Compile Include="Projections\ProjectionIsometric.cs" />
     <Compile Include="Projections\ProjectionOrthographic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

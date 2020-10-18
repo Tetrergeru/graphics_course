@@ -17,8 +17,9 @@ namespace GraphFunc
         
         private List<IProjection> _projection = new List<IProjection>
         {
-            new ProjectionOrthographic(Axis.Y),
+            new ProjectionIsometric(),
             new ProjectionOrthographic(Axis.Z),
+            new ProjectionOrthographic(Axis.Y),
             new ProjectionOrthographic(Axis.X),
         };
 
