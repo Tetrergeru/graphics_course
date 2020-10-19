@@ -14,9 +14,17 @@ namespace GraphFunc
         
         private const int ScreenHeight = 1000;
         
-        private const float Max = 100000;
+        private const float Max = 20;
         
         private PictureBox _screen;
+        
+        private readonly List<String> _models = new List<string>
+        {
+            "Models/Cube.obj",
+            "Models/Skull.obj",
+        };
+        
+        private int _currentModel;
         
         private Model _model = Model.LoadFromObj(File.ReadLines("Models/Cube.obj"));
         
@@ -45,9 +53,15 @@ namespace GraphFunc
                 Width = ScreenHeight,
             };
             _screen.Image = new Bitmap(_screen.Width, _screen.Height);
-            _screen.Click += (sender, args) =>
+            _screen.MouseUp += (sender, args) =>
             {
-                _currentProjection = (_currentProjection + 1) % _projection.Count;
+                if (args.Button == MouseButtons.Left)
+                    _currentProjection = (_currentProjection + 1) % _projection.Count;
+                else
+                {
+                    _currentModel = (_currentModel + 1) % _models.Count;
+                    _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]));
+                }
                 DrawAll();
             };
             
@@ -66,9 +80,9 @@ namespace GraphFunc
                 Top = 25,
                 Width = 15,
                 Height = 1000,
-                Minimum = 10,
-                Maximum = 50,
-                Value = 10,
+                Minimum = 50,
+                Maximum = 150,
+                Value = 50,
             };
             scrollBar.Scroll += (sender, args) =>
             {
