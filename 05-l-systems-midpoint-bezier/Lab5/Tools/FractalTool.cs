@@ -85,11 +85,28 @@ namespace GraphFunc.Tools
                     _fname = openFileDialog.FileName;
                 ParseFile();
             };
-
             panel.Controls.Add(fileLoad);
+
+            var treeButton = new Button
+            {
+                Left = 490,
+                Top = panel.Height - BottomSpace + 10,
+                Text = "Draw tree",
+                Width = 150,
+                Height = 25,
+
+            };
+            treeButton.Click += (sender, args) =>
+            {
+               
+                _fname = "twee.txt";
+                ParseFile();
+            };
+            panel.Controls.Add(treeButton);
+
         }
 
-        private void FractalDraw(string state, (double, double) angle, string direction)
+        private void FractalDraw(string state, (double, double) angle, string direction, bool WhoCalls = false)
         {
 
             var points = new List<Point>();
@@ -196,13 +213,56 @@ namespace GraphFunc.Tools
                 newPoints.Add(np);
             }
 
-            var pen = new Pen(Color.Red, 2);
-            var picture = new Bitmap(_picture.Image);
-            _drawer = Graphics.FromImage(picture);
-            _drawer.Clear(Color.White);
-            _picture.Image = picture;
-            for (var i = 0; i < newPoints.Count - 1; i++)
-                _drawer.DrawLine(pen, newPoints[i], newPoints[i + 1]);
+            if (!WhoCalls)
+            {
+                var pen = new Pen(Color.Red, 2);
+                var picture = new Bitmap(_picture.Image);
+                _drawer = Graphics.FromImage(picture);
+                _drawer.Clear(Color.White);
+                _picture.Image = picture;
+                for (var i = 0; i < newPoints.Count - 1; i++)
+                    _drawer.DrawLine(pen, newPoints[i], newPoints[i + 1]);
+            }
+            else
+            {
+                var pen = new Pen(Color.Green, 20);
+                var picture = new Bitmap(_picture.Image);
+                _drawer = Graphics.FromImage(picture);
+                _drawer.Clear(Color.White);
+                _picture.Image = picture;
+                for (var i = 0; i < newPoints.Count - 1; i++)
+                {
+                    var penWidth = 20- (newPoints[i].Y / 12);
+                    penWidth = 13 - penWidth - 4;
+                    if (penWidth <= 3)
+                        penWidth = 3;
+                    if (penWidth >= 15)
+                        penWidth = 15;
+
+                    var gamma = (double)newPoints[i].Y / _picture.Size.Height;
+
+                    var r1 = Math.Pow(Color.Brown.R / 255.0, gamma);
+                    var r2 = Math.Pow(Color.Green.R / 255.0, gamma);
+                    var rs = (r1 + r2) / 2.0;
+                    var r = 255 * Math.Pow(rs, 1.0 / gamma);
+
+                    var g1 = Math.Pow(Color.Brown.G / 255.0, gamma);
+                    var g2 = Math.Pow(Color.Green.G / 255.0, gamma);
+                    var gs = (g1 + g2) / 2.0;
+                    var g = 255 * Math.Pow(gs, 1.0 / gamma);
+
+                    var b1 = Math.Pow(Color.Brown.B / 255.0, gamma);
+                    var b2 = Math.Pow(Color.Green.B / 255.0, gamma);
+                    var bs = (b1 + b2) / 2.0;
+                    var b = 255 * Math.Pow(bs, 1.0 / gamma);
+
+                    Color col = Color.FromArgb((int)Math.Round(r), (int)Math.Round(g), (int)Math.Round(b));
+                    pen = new Pen(col, penWidth);
+                    
+                    Console.WriteLine(r);
+                    _drawer.DrawLine(pen, newPoints[i], newPoints[i + 1]);
+                }
+            }
         }
 
         private void ParseFile()
@@ -240,9 +300,13 @@ namespace GraphFunc.Tools
             }
 
             //Console.WriteLine(current_state);
-            FractalDraw(current_state, angle, direction);
+            if (_fname.Contains("twee"))
+                FractalDraw(current_state, angle, direction, true);
+            else
+                FractalDraw(current_state, angle, direction, false);
         }
     
+
 
         public override string ToString() => "Fractal";
     }
