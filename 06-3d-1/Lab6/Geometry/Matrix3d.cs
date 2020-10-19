@@ -34,6 +34,12 @@ namespace GraphFunc.Geometry
 
         public Matrix3d Move(Point3 delta)
             => Multiply(MoveMatrix(delta));
+        //вращение вокруг прямой, проходящей через центр параллельно одной из осей
+        public Matrix3d AxisLineRotate((double, double, double) vec, double angle)
+            => Multiply(AxisLineRotationMatrix(vec, angle));
+        //вращение вокруг произволльной прямой
+        public Matrix3d LineRotate(Point3 p1, Point3 p2, double angle)
+            => Multiply(LineRotationMatrix(p1, p2, angle));
 
         public Matrix3d Set(int x, int y, float value)
         {
@@ -70,6 +76,57 @@ namespace GraphFunc.Geometry
             };
         }
 
+        public static Matrix3d AxisLineRotationMatrix((double, double, double) vec, double angle)
+        {
+            return new Matrix3d
+            {
+                [0, 0] = (float)(vec.Item1 * vec.Item1 + Math.Cos(angle) * (1 - vec.Item1 * vec.Item1)),
+                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
+                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [0, 3] = 0,
+                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
+                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
+                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
+                [1, 3] = 0,
+                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
+                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
+                [2, 3] = 0,
+                [3, 0] = 0,
+                [3, 1] = 0,
+                [3, 2] = 0,
+                [3, 3] = 1
+            };
+        }
+
+        public static Matrix3d LineRotationMatrix(Point3 p1, Point3 p2, double angle)
+        {
+            double v_x = p2.X - p1.X;
+            double v_y = p2.Y - p1.Y;
+            double v_z = p2.Z - p1.Z;
+            double length = Math.Sqrt(v_x * v_x + v_y * v_y + v_z * v_z);
+            (double, double, double) vec = (v_x / length, v_y / length, v_z / length);
+
+            return new Matrix3d
+            {
+                [0, 0] = (float)(vec.Item1 * vec.Item1 + Math.Cos(angle) * (1 - vec.Item1 * vec.Item1)),
+                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
+                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [0, 3] = 0,
+                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
+                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
+                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
+                [1, 3] = 0,
+                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
+                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
+                [2, 3] = 0,
+                [3, 0] = 0,
+                [3, 1] = 0,
+                [3, 2] = 0,
+                [3, 3] = 1
+            };
+        }
         public static Matrix3d One => new Matrix3d
         {
             [0, 0] = 1,

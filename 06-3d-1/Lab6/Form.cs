@@ -22,6 +22,7 @@ namespace GraphFunc
         {
             "Models/Cube.obj",
             "Models/Skull.obj",
+            "Models/Prism.obj"
         };
         
         private int _currentModel;

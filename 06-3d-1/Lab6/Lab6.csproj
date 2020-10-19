@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Models\Prism.obj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Cube.obj">
