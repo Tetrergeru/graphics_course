@@ -81,7 +81,7 @@ namespace GraphFunc
                 Width = 15,
                 Height = 1000,
                 Minimum = 50,
-                Maximum = 150,
+                Maximum = 300,
                 Value = 50,
             };
             scrollBar.Scroll += (sender, args) =>
@@ -90,7 +90,10 @@ namespace GraphFunc
                     .One
                     .Rotate(Axis.X, Math.PI / 2 + Math.PI / 12)
                     .Rotate(Axis.Y, -Math.PI / 12)
-                    .Move(new Point3(0, 0, scrollBar.Value));
+                    .Set(0, 2, 0)
+                    .ClearAxis(Axis.Z)
+                    .Move(new Point3(0, 0, scrollBar.Value))
+                    ;
                 DrawAll();
             };
             Controls.Add(scrollBar);

@@ -8,8 +8,9 @@ namespace GraphFunc.Projections
     {
         public static readonly Matrix3d Matrix = Matrix3d
             .One
-            .Rotate(Axis.X, Math.PI/2 + Math.PI/12)
-            .Rotate(Axis.Y, -Math.PI/12)
+            .Rotate(Axis.X, Math.PI/2 + Math.PI/6)
+            .Rotate(Axis.Y, Math.PI/6)
+            .Rotate(Axis.Z, -Math.PI/6)
             .Set(0, 2, 0)
             .ClearAxis(Axis.Z)
             ;
