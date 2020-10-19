@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -13,13 +14,13 @@ namespace GraphFunc
         
         private const int ScreenHeight = 1000;
         
-        private const float Max = 1000;
+        private const float Max = 100000;
         
         private PictureBox _screen;
         
         private Model _model = Model.LoadFromObj(File.ReadLines("Models/Cube.obj"));
         
-        private List<IProjection> _projection = new List<IProjection>
+        private readonly List<IProjection> _projection = new List<IProjection>
         {
             new ProjectionPerspective(),
             new ProjectionIsometric(),
@@ -28,7 +29,7 @@ namespace GraphFunc
             new ProjectionOrthographic(Axis.X),
         };
 
-        private int _currentProjection = 0;
+        private int _currentProjection;
         
         public Form()
         {
@@ -51,7 +52,34 @@ namespace GraphFunc
             };
             
             Controls.Add(_screen);
+
+            ControlTools();
+            
             DrawAll();
+        }
+
+        private void ControlTools()
+        {
+            var scrollBar = new VScrollBar
+            {
+                Left = 10,
+                Top = 25,
+                Width = 15,
+                Height = 1000,
+                Minimum = 10,
+                Maximum = 50,
+                Value = 10,
+            };
+            scrollBar.Scroll += (sender, args) =>
+            {
+                ProjectionPerspective.Matrix = Matrix3d
+                    .One
+                    .Rotate(Axis.X, Math.PI / 2 + Math.PI / 12)
+                    .Rotate(Axis.Y, -Math.PI / 12)
+                    .Move(new Point3(0, 0, scrollBar.Value));
+                DrawAll();
+            };
+            Controls.Add(scrollBar);
         }
 
         private void DrawAll()

@@ -11,9 +11,9 @@ namespace GraphFunc
             => new Point((int) point.X, (int) point.Y);
 
         [STAThread]
-        private static void Main(string[] args)
+        private static void Main()
         {
-            Console.WriteLine(ProjectionIsometric.Matrix);
+            Console.WriteLine(ProjectionPerspective.Matrix);
             var form = new Form();
             Application.Run(form);
         }

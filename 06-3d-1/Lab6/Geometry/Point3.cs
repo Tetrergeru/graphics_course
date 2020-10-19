@@ -1,16 +1,14 @@
-﻿using System;
-
-namespace GraphFunc.Geometry
+﻿namespace GraphFunc.Geometry
 {
     public class Point3
     {
-        public float X;
+        public readonly float X;
         
-        public float Y;
+        public readonly float Y;
         
-        public float Z;
+        public readonly float Z;
 
-        public float W;
+        public readonly float W;
 
         public Point3(float x, float y, float z, float w = 1)
         {

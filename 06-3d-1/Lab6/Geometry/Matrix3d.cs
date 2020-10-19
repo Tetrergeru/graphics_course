@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 
 namespace GraphFunc.Geometry
 {
@@ -33,6 +32,8 @@ namespace GraphFunc.Geometry
         public Matrix3d Rotate(Axis axis, double angle)
             => Multiply(RotationMatrix(axis, angle));
 
+        public Matrix3d Move(Point3 delta)
+            => Multiply(MoveMatrix(delta));
 
         public Matrix3d Set(int x, int y, float value)
         {
@@ -41,56 +42,34 @@ namespace GraphFunc.Geometry
         }
 
         public Matrix3d ClearAxis(Axis axis)
-        {
-            switch (axis) {
-                case Axis.X:
-                    this[0, 0] = 0;
-                    break;
-                case Axis.Y:
-                    this[1, 1] = 0;
-                    break;
-                case Axis.Z:
-                    this[2, 2] = 0;
-                    break;
-                default:
-                    throw new ArgumentException("Wrong value of Axis");
-            }
-            return this;
-        }
-        
+            => Set((int) axis, (int) axis, 0);
+
+        public static Matrix3d MoveMatrix(Point3 delta)
+            => One
+                .Set(0, 3, delta.X)
+                .Set(1, 3, delta.Y)
+                .Set(2, 3, delta.Z);
+
         public static Matrix3d RotationMatrix(Axis axis, double angle)
-            => axis switch
+        {
+            var (axis1, axis2) = axis switch
             {
-                Axis.X => new Matrix3d
-                {
-                    [0, 0] = 1,
-                    [1, 1] = (float) Math.Cos(angle),
-                    [2, 2] = (float) Math.Cos(angle),
-                    [1, 2] = (float) -Math.Sin(angle),
-                    [2, 1] = (float) Math.Sin(angle),
-                    [3, 3] = 1,
-                },
-                Axis.Y => new Matrix3d
-                {
-                    [1, 1] = 1,
-                    [0, 0] = (float) Math.Cos(angle),
-                    [2, 2] = (float) Math.Cos(angle),
-                    [0, 2] = (float) -Math.Sin(angle),
-                    [2, 0] = (float) Math.Sin(angle),
-                    [3, 3] = 1,
-                },
-                Axis.Z => new Matrix3d
-                {
-                    [2, 2] = 1,
-                    [0, 0] = (float) Math.Cos(angle),
-                    [1, 1] = (float) Math.Cos(angle),
-                    [0, 1] = (float) -Math.Sin(angle),
-                    [1, 0] = (float) Math.Sin(angle),
-                    [3, 3] = 1,
-                },
-                _ => throw new ArgumentException("Wrong value of Axis")
+                Axis.X => (Axis.Y, Axis.Z),
+                Axis.Y => (Axis.X, Axis.Z),
+                Axis.Z => (Axis.X, Axis.Y),
+                _ => throw new ArgumentException("Wrong value of Axis"),
             };
-        
+            return new Matrix3d
+            {
+                [(int)axis, (int)axis] = 1,
+                [(int)axis1, (int)axis1] = (float) Math.Cos(angle),
+                [(int)axis2, (int)axis2] = (float) Math.Cos(angle),
+                [(int)axis1, (int)axis2] = (float) -Math.Sin(angle),
+                [(int)axis2, (int)axis1] = (float) Math.Sin(angle),
+                [3, 3] = 1,
+            };
+        }
+
         public static Matrix3d One => new Matrix3d
         {
             [0, 0] = 1,
@@ -100,12 +79,9 @@ namespace GraphFunc.Geometry
         };
 
         public override string ToString()
-        {
-            return $"{this[0, 0]:0.000}  {this[0, 1]:0.000}  {this[0, 2]:0.000}  {this[0, 3]:0.000}\n"
-                   + $"{this[1, 0]:0.000}  {this[1, 1]:0.000}  {this[1, 2]:0.000}  {this[1, 3]:0.000}\n"
-                   + $"{this[2, 0]:0.000}  {this[2, 1]:0.000}  {this[2, 2]:0.000}  {this[2, 3]:0.000}\n"
-                   + $"{this[3, 0]:0.000}  {this[3, 1]:0.000}  {this[3, 2]:0.000}  {this[3, 3]:0.000}\n"
-                ;
-        }
+            => $"{this[0, 0]:0.000}  {this[0, 1]:0.000}  {this[0, 2]:0.000}  {this[0, 3]:0.000}\n" +
+               $"{this[1, 0]:0.000}  {this[1, 1]:0.000}  {this[1, 2]:0.000}  {this[1, 3]:0.000}\n" +
+               $"{this[2, 0]:0.000}  {this[2, 1]:0.000}  {this[2, 2]:0.000}  {this[2, 3]:0.000}\n" +
+               $"{this[3, 0]:0.000}  {this[3, 1]:0.000}  {this[3, 2]:0.000}  {this[3, 3]:0.000}\n";
     }
 }

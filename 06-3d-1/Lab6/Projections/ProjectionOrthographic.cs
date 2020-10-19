@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using GraphFunc.Geometry;
 
@@ -12,8 +11,8 @@ namespace GraphFunc.Projections
         public ProjectionOrthographic(Axis ignoredAxis)
         {
             _projectionMatrix = Matrix3d
-                .One
-                .Rotate(ignoredAxis, Math.PI / 2)
+                    .One
+                    .Rotate(ignoredAxis, Math.PI / 2)
                 ;
         }
 
