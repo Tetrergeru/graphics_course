@@ -117,6 +117,12 @@ namespace GraphFunc
                     case Keys.PageDown:
                         _model.Rotate(Axis.Z, -(float)Math.PI/12);
                         break;
+                    case Keys.F1:
+                        _model.Scale(1.1f);
+                        break;
+                    case Keys.F2:
+                        _model.Scale(0.9f);
+                        break;
                 }
                 DrawAll();
             };

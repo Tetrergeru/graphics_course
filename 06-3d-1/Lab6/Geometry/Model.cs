@@ -13,6 +13,8 @@ namespace GraphFunc.Geometry
         
         public readonly List<Polygon> Polygons = new List<Polygon>();
 
+        public void Scale(float m)
+            => Apply(Matrix3d.ScaleMatrix(m));
         public void Move(Point3 delta)
             => Apply(Matrix3d.MoveMatrix(delta));
 

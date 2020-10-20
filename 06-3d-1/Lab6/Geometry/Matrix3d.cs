@@ -40,6 +40,9 @@ namespace GraphFunc.Geometry
         //вращение вокруг произволльной прямой
         public Matrix3d LineRotate(Point3 p1, Point3 p2, double angle)
             => Multiply(LineRotationMatrix(p1, p2, angle));
+        //масштабирование
+        public Matrix3d Scale(float m)
+            => Multiply(ScaleMatrix(m));
 
         public Matrix3d Set(int x, int y, float value)
         {
@@ -48,7 +51,7 @@ namespace GraphFunc.Geometry
         }
 
         public Matrix3d ClearAxis(Axis axis)
-            => Set((int) axis, (int) axis, 0);
+            => Set((int)axis, (int)axis, 0);
 
         public static Matrix3d MoveMatrix(Point3 delta)
             => One
@@ -127,6 +130,18 @@ namespace GraphFunc.Geometry
                 [3, 3] = 1
             };
         }
+
+        public static Matrix3d ScaleMatrix(float m)
+        {
+            return new Matrix3d
+            {
+                [0, 0] = m,
+                [1, 1] = m,
+                [2, 2] = m,
+                [3, 3] = 1
+            };
+        }
+
         public static Matrix3d One => new Matrix3d
         {
             [0, 0] = 1,
