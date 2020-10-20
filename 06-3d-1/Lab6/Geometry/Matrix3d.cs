@@ -46,6 +46,9 @@ namespace GraphFunc.Geometry
         //масштабирование
         public Matrix3d Scale(float m)
             => Multiply(ScaleMatrix(m));
+        
+        public Matrix3d ScalePoint(Point3 point,float m)
+            => Multiply(ScalePointMatrix(point, m));
 
         public Matrix3d Set(int x, int y, float value)
         {
@@ -133,6 +136,9 @@ namespace GraphFunc.Geometry
                 [3, 3] = 1
             };
         }
+
+        public static Matrix3d ScalePointMatrix(Point3 point, float m)
+            => MoveMatrix(new Point3(-point.X, -point.Y, -point.Z)).Scale(m).Move(point);
 
         public static Matrix3d ScaleMatrix(float m)
         {

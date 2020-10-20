@@ -12,11 +12,34 @@ namespace GraphFunc.Geometry
         private List<Point3> _points;
 
         public string Name = "";
-        
+
         public readonly List<Polygon> Polygons = new List<Polygon>();
+
+        public Point3 Center
+        {
+            get
+            {
+                var sum = new Point3(0 ,0, 0);
+                foreach (var point in _points)
+                {
+                    sum.X += point.X;
+                    sum.Y += point.Y;
+                    sum.Z += point.Z;
+                }
+
+                sum.X /= _points.Count;
+                sum.Y /= _points.Count;
+                sum.Z /= _points.Count;
+                Console.WriteLine(sum);
+                return sum;
+            }
+        }
 
         public void Scale(float m)
             => Apply(Matrix3d.ScaleMatrix(m));
+        
+        public void ScaleCenter(float m)
+            => Apply(Matrix3d.ScalePointMatrix(Center, m));
         
         public void Move(Point3 delta)
             => Apply(Matrix3d.MoveMatrix(delta));

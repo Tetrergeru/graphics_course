@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -165,17 +164,15 @@ namespace GraphFunc
                         _model.Rotate(Axis.Z, -(float)Math.PI/12);
                         break;
                     case Keys.F1:
-                        _model.Scale(1.1f);
+                        _model.ScaleCenter(1.1f);
                         break;
                     case Keys.F2:
-                        _model.Scale(0.9f);
+                        _model.ScaleCenter(0.9f);
                         break;
                     case Keys.Z:
-                        Console.WriteLine("Z");
                         _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
                         break;
                     case Keys.X:
-                        Console.WriteLine("X");
                         _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
                         break;
                 }
@@ -184,7 +181,7 @@ namespace GraphFunc
 
             MouseWheel += (sender, args) =>
             {
-                _model.Scale(args.Delta > 0 ? 1.1f : 0.9f);
+                _model.ScaleCenter(args.Delta > 0 ? 1.1f : 0.9f);
                 DrawAll();
             };
         }
