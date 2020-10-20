@@ -61,6 +61,7 @@
     <Compile Include="Geometry\Polygon2.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Projections\Projector.cs" />
     <Compile Include="Projections\IProjection.cs" />
     <Compile Include="Projections\ProjectionIsometric.cs" />
     <Compile Include="Projections\ProjectionOrthographic.cs" />
@@ -72,6 +73,9 @@
     <None Include="Models\Prism.obj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Models\Cat.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Models\Cube.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

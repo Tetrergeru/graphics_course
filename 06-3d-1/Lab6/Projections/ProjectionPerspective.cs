@@ -6,18 +6,12 @@ namespace GraphFunc.Projections
 {
     public class ProjectionPerspective : IProjection
     {
-        private const int ObserverDistance = 50;
-        
-        public static Matrix3d Matrix = Matrix3d
-                .One
-                //.Rotate(Axis.X, Math.PI/2 + Math.PI/12)
-                //.Rotate(Axis.Y, -Math.PI/12)
-            ;
-        
+        public static readonly Projector Projector = new Projector(
+            new Point3(0, 0, 0),
+            new Point3(0, 0, 0),
+            20);
+
         public PointF Project(Point3 point)
-        {
-            var point3 = Matrix.Multiply(point);
-            return new PointF(point3.X / (point3.Z / ObserverDistance), point3.Y / (point3.Z / ObserverDistance));
-        }
+            => Projector.Project(point);
     }
 }

@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace GraphFunc.Geometry
 {
     public class Model
     {
-        public readonly List<Polygon> Polygons = new List<Polygon>();
+        private List<Point3> _points;
         
+        public readonly List<Polygon> Polygons = new List<Polygon>();
+
+        public void Move(Point3 delta)
+            => Apply(Matrix3d.MoveMatrix(delta));
+
+        public void Rotate(Axis axis, float angle)
+            => Apply(Matrix3d.RotationMatrix(axis, angle));
+
+        private void Apply(Matrix3d matrix)
+        {
+            foreach(var point in _points)
+                point.Apply(matrix);
+        }
+
         public static Model LoadFromObj(IEnumerable<string> file)
         {
             var model = new Model();
@@ -26,6 +41,8 @@ namespace GraphFunc.Geometry
                 else if (split[0] == "f")
                     model.Polygons.Add(ParsePolygon(split, points));
             }
+
+            model._points = points;
             return model;
         }
 

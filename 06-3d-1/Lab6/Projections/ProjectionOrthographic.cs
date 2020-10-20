@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using GraphFunc.Geometry;
 
@@ -6,20 +7,22 @@ namespace GraphFunc.Projections
 {
     public class ProjectionOrthographic : IProjection
     {
-        private readonly Matrix3d _projectionMatrix;
+        private readonly Projector _projector;
 
         public ProjectionOrthographic(Axis ignoredAxis)
         {
-            _projectionMatrix = Matrix3d
-                    .One
-                    .Rotate(ignoredAxis, Math.PI / 2)
-                ;
+            _projector = new Projector(
+                new Point3(0, 0, 0),
+                ignoredAxis switch
+                {
+                    Axis.X => new Point3(0, (float) Math.PI / 2, 0),
+                    Axis.Y => new Point3((float) Math.PI / 2, 0, 0),
+                    Axis.Z => new Point3(0, 0, 0),
+                },
+                float.PositiveInfinity);
         }
 
         public PointF Project(Point3 point)
-        {
-            var point3 = _projectionMatrix.Multiply(point);
-            return new PointF(point3.X, point3.Y);
-        }
+            => _projector.Project(point);
     }
 }

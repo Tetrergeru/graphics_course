@@ -13,7 +13,6 @@ namespace GraphFunc
         [STAThread]
         private static void Main()
         {
-            Console.WriteLine(ProjectionPerspective.Matrix);
             var form = new Form();
             Application.Run(form);
         }

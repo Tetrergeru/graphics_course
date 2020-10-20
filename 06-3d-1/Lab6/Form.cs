@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -10,9 +11,9 @@ namespace GraphFunc
 {
     public class Form : System.Windows.Forms.Form
     {
-        private const int ScreenWidth = 1000;
+        private const int ScreenWidth = 750;
         
-        private const int ScreenHeight = 1000;
+        private const int ScreenHeight = 750;
         
         private const float Max = 20;
         
@@ -22,7 +23,8 @@ namespace GraphFunc
         {
             "Models/Cube.obj",
             "Models/Skull.obj",
-            "Models/Prism.obj"
+            "Models/Prism.obj",
+            "Models/Cat.obj",
         };
         
         private int _currentModel;
@@ -50,8 +52,8 @@ namespace GraphFunc
             {
                 Left = 25,
                 Top = 25,
-                Height = ScreenWidth,
-                Width = ScreenHeight,
+                Height = ScreenHeight,
+                Width = ScreenWidth,
             };
             _screen.Image = new Bitmap(_screen.Width, _screen.Height);
             _screen.MouseUp += (sender, args) =>
@@ -66,38 +68,58 @@ namespace GraphFunc
                 DrawAll();
             };
             
-            Controls.Add(_screen);
-
             ControlTools();
             
+            Controls.Add(_screen);
+
             DrawAll();
         }
 
         private void ControlTools()
         {
-            var scrollBar = new VScrollBar
+            KeyUp += (sender, args) =>
             {
-                Left = 10,
-                Top = 25,
-                Width = 15,
-                Height = 1000,
-                Minimum = 50,
-                Maximum = 300,
-                Value = 50,
-            };
-            scrollBar.Scroll += (sender, args) =>
-            {
-                ProjectionPerspective.Matrix = Matrix3d
-                    .One
-                    .Rotate(Axis.X, Math.PI / 2 + Math.PI / 12)
-                    .Rotate(Axis.Y, -Math.PI / 12)
-                    .Set(0, 2, 0)
-                    .ClearAxis(Axis.Z)
-                    .Move(new Point3(0, 0, scrollBar.Value))
-                    ;
+                switch (args.KeyCode)
+                {
+                    case Keys.W:
+                        _model.Move(new Point3(0, -1, 0));
+                        break;
+                    case Keys.S:
+                        _model.Move(new Point3(0, 1, 0));
+                        break;
+                    case Keys.A:
+                        _model.Move(new Point3(-1, 0, 0));
+                        break;
+                    case Keys.D:
+                        _model.Move(new Point3(1, 0, 0));
+                        break;
+                    case Keys.Q:
+                        _model.Move(new Point3(0, 0, -1));
+                        break;
+                    case Keys.E:
+                        _model.Move(new Point3(0, 0, 1));
+                        break;
+                    case Keys.Left:
+                        _model.Rotate(Axis.Y, (float)Math.PI/12);
+                        break;
+                    case Keys.Right:
+                        _model.Rotate(Axis.Y, -(float)Math.PI/12);
+                        break;
+                    case Keys.Up:
+                        _model.Rotate(Axis.X, (float)Math.PI/12);
+                        break;
+                    case Keys.Down:
+                        _model.Rotate(Axis.X, -(float)Math.PI/12);
+                        break;
+                    case Keys.PageUp:
+                        _model.Rotate(Axis.Z, (float)Math.PI/12);
+                        break;
+                    case Keys.PageDown:
+                        _model.Rotate(Axis.Z, -(float)Math.PI/12);
+                        break;
+                }
                 DrawAll();
             };
-            Controls.Add(scrollBar);
         }
 
         private void DrawAll()
@@ -143,7 +165,7 @@ namespace GraphFunc
             foreach (var polygon in model.Polygons)
                 polygon
                     .Project(_projection[_currentProjection])
-                    .Scale(new PointF(0, 0), (30, 30))
+                    .Scale(new PointF(0, 0), (20, 20))
                     .Move(new PointF(_screen.Image.Width / 2f, _screen.Image.Height / 2f))
                     .Draw(drawer, polygon.Color);
 
