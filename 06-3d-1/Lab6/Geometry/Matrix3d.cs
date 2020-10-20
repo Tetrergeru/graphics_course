@@ -34,12 +34,15 @@ namespace GraphFunc.Geometry
 
         public Matrix3d Move(Point3 delta)
             => Multiply(MoveMatrix(delta));
+        
         //вращение вокруг прямой, проходящей через центр параллельно одной из осей
         public Matrix3d AxisLineRotate((double, double, double) vec, double angle)
             => Multiply(AxisLineRotationMatrix(vec, angle));
+        
         //вращение вокруг произволльной прямой
         public Matrix3d LineRotate(Point3 p1, Point3 p2, double angle)
             => Multiply(LineRotationMatrix(p1, p2, angle));
+        
         //масштабирование
         public Matrix3d Scale(float m)
             => Multiply(ScaleMatrix(m));

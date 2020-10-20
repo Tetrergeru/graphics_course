@@ -15,13 +15,17 @@ namespace GraphFunc.Geometry
 
         public void Scale(float m)
             => Apply(Matrix3d.ScaleMatrix(m));
+        
         public void Move(Point3 delta)
             => Apply(Matrix3d.MoveMatrix(delta));
 
         public void Rotate(Axis axis, float angle)
             => Apply(Matrix3d.RotationMatrix(axis, angle));
 
-        private void Apply(Matrix3d matrix)
+        public void RotateLine(Point3 p1, Point3 p2, double angle)
+            => Apply(Matrix3d.LineRotationMatrix(p1, p2, angle));
+
+            private void Apply(Matrix3d matrix)
         {
             foreach(var point in _points)
                 point.Apply(matrix);

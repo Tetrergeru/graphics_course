@@ -14,6 +14,8 @@ namespace GraphFunc
         private const int ScreenWidth = 750;
         
         private const int ScreenHeight = 750;
+
+        private const int PointPanelWidth = 100;
         
         private const float Max = 20;
         
@@ -41,11 +43,14 @@ namespace GraphFunc
         };
 
         private int _currentProjection;
+
+        private (Point3 from, Point3 to) RotationLine = (new Point3(0, 0, 0), new Point3(0, 0, 75));
         
         public Form()
         {
+            KeyPreview = true;
             BackColor = Color.Beige;
-            Width = ScreenWidth + 50 + 19;
+            Width = ScreenWidth + PointPanelWidth + 50 + 19;
             Height = ScreenHeight + 50 + 27;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             _screen = new PictureBox
@@ -77,7 +82,36 @@ namespace GraphFunc
 
         private void ControlTools()
         {
-            KeyUp += (sender, args) =>
+            var x1Field = ControlBox(25, 0);
+            var y1Field = ControlBox(25, 1);
+            var z1Field = ControlBox(25, 2);
+            var x2Field = ControlBox(100, 0);
+            var y2Field = ControlBox(100, 1);
+            var z2Field = ControlBox(100, 2);
+            var button = new Button
+            {
+                Left = ScreenWidth + 25 + 10,
+                Width = 75,
+                Height = 20,
+                Top = 130,
+                Text = "Set Points",
+            };
+            button.Click += (sender, args) => 
+            {
+                RotationLine = (
+                    new Point3(
+                        IntParse(x1Field.Text, 0),
+                        IntParse(y1Field.Text, 0),
+                        IntParse(z1Field.Text, 0)),
+                    new Point3(
+                        IntParse(x2Field.Text, 0),
+                        IntParse(y2Field.Text, 0),
+                        IntParse(z2Field.Text, 75))
+                    );
+                DrawAll();
+            };
+            Controls.Add(button);
+            KeyDown += (sender, args) =>
             {
                 switch (args.KeyCode)
                 {
@@ -123,6 +157,14 @@ namespace GraphFunc
                     case Keys.F2:
                         _model.Scale(0.9f);
                         break;
+                    case Keys.Z:
+                        Console.WriteLine("Z");
+                        _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
+                        break;
+                    case Keys.X:
+                        Console.WriteLine("X");
+                        _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
+                        break;
                 }
                 DrawAll();
             };
@@ -160,10 +202,35 @@ namespace GraphFunc
                             new Point3(0, 0, Max)
                         }
                     },
+                    new Polygon(Color.Purple)
+                    {
+                        Points =
+                        {
+                            RotationLine.from, 
+                            RotationLine.to,
+                        }
+                    },
                 }
             }, drawer);
             DrawPolygon(_model, drawer);
             _screen.Image = _screen.Image;
+        }
+
+        private static int IntParse(string str, int def)
+            => !int.TryParse(str, out var result) ? def : result;
+
+        private TextBox ControlBox(int top, int idx)
+        {
+            var textBox = new TextBox
+            {
+                Left = ScreenWidth + 25 + 10 + 25 * idx,
+                Width = 20,
+                Height = 15,
+                Top = top,
+                Text = (idx != 2 ? 0 : top - 25).ToString(),
+            };
+            Controls.Add(textBox);
+            return textBox;
         }
 
         private void DrawPolygon(Model model, Graphics drawer)
