@@ -85,6 +85,9 @@ namespace GraphFunc.Geometry
             };
         }
 
+        public static Matrix3d RotationCenterMatrix(Point3 point, Axis axis, float angle)
+            => MoveMatrix(new Point3(-point.X, -point.Y, -point.Z)).Rotate(axis, angle).Move(point);
+
         public static Matrix3d AxisLineRotationMatrix((double, double, double) vec, double angle)
         {
             return new Matrix3d

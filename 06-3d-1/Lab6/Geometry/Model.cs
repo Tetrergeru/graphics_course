@@ -46,6 +46,9 @@ namespace GraphFunc.Geometry
 
         public void Rotate(Axis axis, float angle)
             => Apply(Matrix3d.RotationMatrix(axis, angle));
+        
+        public void RotateCenter(Axis axis, float angle)
+            => Apply(Matrix3d.RotationCenterMatrix(Center, axis, angle));
 
         public void RotateLine(Point3 p1, Point3 p2, double angle)
             => Apply(Matrix3d.LineRotationMatrix(p1, p2, angle));

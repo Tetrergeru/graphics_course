@@ -146,22 +146,22 @@ namespace GraphFunc
                         _model.Move(new Point3(0, 0, 1));
                         break;
                     case Keys.Left:
-                        _model.Rotate(Axis.Y, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, (float)Math.PI/12);
                         break;
                     case Keys.Right:
-                        _model.Rotate(Axis.Y, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, -(float)Math.PI/12);
                         break;
                     case Keys.Up:
-                        _model.Rotate(Axis.X, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, (float)Math.PI/12);
                         break;
                     case Keys.Down:
-                        _model.Rotate(Axis.X, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, -(float)Math.PI/12);
                         break;
                     case Keys.PageUp:
-                        _model.Rotate(Axis.Z, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, (float)Math.PI/12);
                         break;
                     case Keys.PageDown:
-                        _model.Rotate(Axis.Z, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, -(float)Math.PI/12);
                         break;
                     case Keys.F1:
                         _model.ScaleCenter(1.1f);
