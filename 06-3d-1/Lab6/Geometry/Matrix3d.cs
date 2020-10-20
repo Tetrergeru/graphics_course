@@ -46,6 +46,9 @@ namespace GraphFunc.Geometry
         //масштабирование
         public Matrix3d Scale(float m)
             => Multiply(ScaleMatrix(m));
+        
+        public Matrix3d ScalePoint(Point3 point,float m)
+            => Multiply(ScalePointMatrix(point, m));
 
         public Matrix3d Set(int x, int y, float value)
         {
@@ -64,13 +67,7 @@ namespace GraphFunc.Geometry
 
         public static Matrix3d RotationMatrix(Axis axis, double angle)
         {
-            var (axis1, axis2) = axis switch
-            {
-                Axis.X => (Axis.Y, Axis.Z),
-                Axis.Y => (Axis.X, Axis.Z),
-                Axis.Z => (Axis.X, Axis.Y),
-                _ => throw new ArgumentException("Wrong value of Axis"),
-            };
+            var (axis1, axis2) = NotAxis(axis);
             return new Matrix3d
             {
                 [(int)axis, (int)axis] = 1,
@@ -81,6 +78,9 @@ namespace GraphFunc.Geometry
                 [3, 3] = 1,
             };
         }
+
+        public static Matrix3d RotationCenterMatrix(Point3 point, Axis axis, float angle)
+            => MoveMatrix(new Point3(-point.X, -point.Y, -point.Z)).Rotate(axis, angle).Move(point);
 
         public static Matrix3d AxisLineRotationMatrix((double, double, double) vec, double angle)
         {
@@ -134,6 +134,9 @@ namespace GraphFunc.Geometry
             };
         }
 
+        public static Matrix3d ScalePointMatrix(Point3 point, float m)
+            => MoveMatrix(new Point3(-point.X, -point.Y, -point.Z)).Scale(m).Move(point);
+
         public static Matrix3d ScaleMatrix(float m)
         {
             return new Matrix3d
@@ -144,6 +147,27 @@ namespace GraphFunc.Geometry
                 [3, 3] = 1
             };
         }
+
+        public static Matrix3d ReflectionMatrix(Axis axis)
+        {
+            var (axis1, axis2) = NotAxis(axis);
+            return new Matrix3d
+            {
+                [(int) axis, (int) axis] = -1,
+                [(int) axis1, (int) axis1] = 1,
+                [(int) axis2, (int) axis2] = 1,
+                [3, 3] = 1,
+            };
+        }
+
+        private static (Axis axis1, Axis axis2) NotAxis(Axis axis)
+            => axis switch
+            {
+                Axis.X => (Axis.Y, Axis.Z),
+                Axis.Y => (Axis.X, Axis.Z),
+                Axis.Z => (Axis.X, Axis.Y),
+                _ => throw new ArgumentException("Wrong value of Axis"),
+            };
 
         public static Matrix3d One => new Matrix3d
         {

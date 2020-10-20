@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -147,37 +146,46 @@ namespace GraphFunc
                         _model.Move(new Point3(0, 0, 1));
                         break;
                     case Keys.Left:
-                        _model.Rotate(Axis.Y, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, (float)Math.PI/12);
                         break;
                     case Keys.Right:
-                        _model.Rotate(Axis.Y, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, -(float)Math.PI/12);
                         break;
                     case Keys.Up:
-                        _model.Rotate(Axis.X, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, (float)Math.PI/12);
                         break;
                     case Keys.Down:
-                        _model.Rotate(Axis.X, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, -(float)Math.PI/12);
                         break;
                     case Keys.PageUp:
-                        _model.Rotate(Axis.Z, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, (float)Math.PI/12);
                         break;
                     case Keys.PageDown:
-                        _model.Rotate(Axis.Z, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, -(float)Math.PI/12);
                         break;
                     case Keys.F1:
-                        _model.Scale(1.1f);
+                        _model.Reflect(Axis.X);
                         break;
                     case Keys.F2:
-                        _model.Scale(0.9f);
+                        _model.Reflect(Axis.Y);
+                        break;
+                    case Keys.F3:
+                        _model.Reflect(Axis.Z);
                         break;
                     case Keys.Z:
+<<<<<<< HEAD
                         _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
+=======
+>>>>>>> 55dbb85ce75d74beb1772e490d66bc76b342163e
                         _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
                         break;
                     case Keys.X:
+<<<<<<< HEAD
                         Console.WriteLine("X");
                         _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
+=======
+>>>>>>> 55dbb85ce75d74beb1772e490d66bc76b342163e
                         _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
 
@@ -188,7 +196,7 @@ namespace GraphFunc
 
             MouseWheel += (sender, args) =>
             {
-                _model.Scale(args.Delta > 0 ? 1.1f : 0.9f);
+                _model.ScaleCenter(args.Delta > 0 ? 1.1f : 0.9f);
                 DrawAll();
             };
         }
