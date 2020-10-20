@@ -171,12 +171,16 @@ namespace GraphFunc
                         _model.Scale(0.9f);
                         break;
                     case Keys.Z:
-                        Console.WriteLine("Z");
+                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
                         _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
+                        _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
                         break;
                     case Keys.X:
                         Console.WriteLine("X");
+                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
                         _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
+                        _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
+
                         break;
                 }
                 DrawAll();

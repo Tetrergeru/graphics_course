@@ -88,7 +88,7 @@ namespace GraphFunc.Geometry
             {
                 [0, 0] = (float)(vec.Item1 * vec.Item1 + Math.Cos(angle) * (1 - vec.Item1 * vec.Item1)),
                 [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
-                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item2 * Math.Sin(angle)),
                 [3, 0] = 0,
                 [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
                 [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
