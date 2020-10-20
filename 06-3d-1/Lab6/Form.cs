@@ -23,19 +23,20 @@ namespace GraphFunc
         
         private readonly List<String> _models = new List<string>
         {
+            "Models/Tetrahedron.obj",
+            "Models/Hexahedron.obj",
+            "Models/Octahedron.obj",
+            "Models/Dodecahedron.obj",
+            "Models/Icosahedron.obj",
             "Models/Cube.obj",
             "Models/Skull.obj",
             "Models/Prism.obj",
             "Models/Cat.obj",
-            "Models/Tetrahedron.obj",
-            "Models/Octahedron.obj",
-            "Models/Dodecahedron.obj.obj",
-            "Models/Icosahedron.obj",
         };
         
         private int _currentModel;
         
-        private Model _model = Model.LoadFromObj(File.ReadLines("Models/Cube.obj"));
+        private Model _model;
         
         private readonly List<IProjection> _projection = new List<IProjection>
         {
@@ -53,10 +54,21 @@ namespace GraphFunc
         public Form()
         {
             KeyPreview = true;
-            BackColor = Color.Beige;
             Width = ScreenWidth + PointPanelWidth + 50 + 19;
             Height = ScreenHeight + 50 + 27;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            BackColor = Color.Beige;
+            _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
+            Text = _model.Name;
+            
+            AddScreen();
+            ControlTools();
+
+            DrawAll();
+        }
+
+        private void AddScreen()
+        {
             _screen = new PictureBox
             {
                 Left = 25,
@@ -72,16 +84,13 @@ namespace GraphFunc
                 else
                 {
                     _currentModel = (_currentModel + 1) % _models.Count;
-                    _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]));
+                    Text = _models[_currentModel];
+                    _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
                 }
                 DrawAll();
             };
             
-            ControlTools();
-            
             Controls.Add(_screen);
-
-            DrawAll();
         }
 
         private void ControlTools()

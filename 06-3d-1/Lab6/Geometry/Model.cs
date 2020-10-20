@@ -10,6 +10,8 @@ namespace GraphFunc.Geometry
     public class Model
     {
         private List<Point3> _points;
+
+        public string Name = "";
         
         public readonly List<Polygon> Polygons = new List<Polygon>();
 
@@ -31,9 +33,9 @@ namespace GraphFunc.Geometry
                 point.Apply(matrix);
         }
 
-        public static Model LoadFromObj(IEnumerable<string> file)
+        public static Model LoadFromObj(IEnumerable<string> file, string name)
         {
-            var model = new Model();
+            var model = new Model {Name = name};
             var points = new List<Point3>();
             foreach (var line in file)
             {
