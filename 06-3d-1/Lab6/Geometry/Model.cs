@@ -53,7 +53,10 @@ namespace GraphFunc.Geometry
         public void RotateLine(Point3 p1, Point3 p2, double angle)
             => Apply(Matrix3d.LineRotationMatrix(p1, p2, angle));
 
-            private void Apply(Matrix3d matrix)
+        public void Reflect(Axis axis)
+            => Apply(Matrix3d.ReflectionMatrix(axis));
+        
+        private void Apply(Matrix3d matrix)
         {
             foreach(var point in _points)
                 point.Apply(matrix);

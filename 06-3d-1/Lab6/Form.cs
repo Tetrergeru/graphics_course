@@ -164,10 +164,13 @@ namespace GraphFunc
                         _model.RotateCenter(Axis.Z, -(float)Math.PI/12);
                         break;
                     case Keys.F1:
-                        _model.ScaleCenter(1.1f);
+                        _model.Reflect(Axis.X);
                         break;
                     case Keys.F2:
-                        _model.ScaleCenter(0.9f);
+                        _model.Reflect(Axis.Y);
+                        break;
+                    case Keys.F3:
+                        _model.Reflect(Axis.Z);
                         break;
                     case Keys.Z:
                         _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
