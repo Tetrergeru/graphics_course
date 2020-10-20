@@ -27,6 +27,10 @@ namespace GraphFunc
             "Models/Skull.obj",
             "Models/Prism.obj",
             "Models/Cat.obj",
+            "Models/Tetrahedron.obj",
+            "Models/Octahedron.obj",
+            "Models/Dodecahedron.obj.obj",
+            "Models/Icosahedron.obj",
         };
         
         private int _currentModel;
