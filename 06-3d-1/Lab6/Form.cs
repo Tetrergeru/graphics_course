@@ -22,6 +22,7 @@ namespace GraphFunc
         
         private readonly List<String> _models = new List<string>
         {
+            "Models/Square.obj",
             "Models/Tetrahedron.obj",
             "Models/Hexahedron.obj",
             "Models/Octahedron.obj",
@@ -100,6 +101,31 @@ namespace GraphFunc
             var x2Field = ControlBox(100, 0);
             var y2Field = ControlBox(100, 1);
             var z2Field = ControlBox(100, 2);
+            var segmentsSpin = ControlBox(250, 1);
+
+            var axisSpin = new CheckedListBox()
+            {
+                Left = ScreenWidth + 25 + 10,
+                Width = 100,
+                Height = 50,
+                Top = 190,
+            };
+            string[] myAxis = { "X", "Y", "Z" };
+            axisSpin.Items.AddRange(myAxis);
+            axisSpin.CheckOnClick = true;
+            axisSpin.SelectionMode = SelectionMode.One;
+            axisSpin.SelectedIndexChanged += (sender, args) =>
+            {
+                if (axisSpin.CheckedItems.Count > 1)
+                {
+                    for (int i = 0; i < axisSpin.Items.Count; i++)
+                        axisSpin.SetItemChecked(i, false);
+                    axisSpin.SetItemChecked(axisSpin.SelectedIndex, true);
+                }
+            };
+            
+            Controls.Add(axisSpin);
+
             var button = new Button
             {
                 Left = ScreenWidth + 25 + 10,
@@ -173,22 +199,22 @@ namespace GraphFunc
                         _model.Reflect(Axis.Z);
                         break;
                     case Keys.Z:
-<<<<<<< HEAD
                         _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
-=======
->>>>>>> 55dbb85ce75d74beb1772e490d66bc76b342163e
                         _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
                         break;
                     case Keys.X:
-<<<<<<< HEAD
-                        Console.WriteLine("X");
                         _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
-=======
->>>>>>> 55dbb85ce75d74beb1772e490d66bc76b342163e
                         _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
-
+                        break;
+                    case Keys.P:
+                        if (_model.Polygons.Count == 1)
+                        {
+                            Model temp = new Model();
+                            temp = _model.MakeSpinObj(_model, axisSpin.CheckedItems[0].ToString(), IntParse(segmentsSpin.Text, 0));
+                            _model = temp;
+                        }
                         break;
                 }
                 DrawAll();

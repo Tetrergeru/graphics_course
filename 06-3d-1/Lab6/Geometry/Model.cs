@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Numerics;
 
 namespace GraphFunc.Geometry
 {
@@ -19,7 +19,7 @@ namespace GraphFunc.Geometry
         {
             get
             {
-                var sum = new Point3(0 ,0, 0);
+                var sum = new Point3(0, 0, 0);
                 foreach (var point in _points)
                 {
                     sum.X += point.X;
@@ -98,6 +98,76 @@ namespace GraphFunc.Geometry
                 polygon.Points.Add(points[pointIdx]);
             }
             return polygon;
+        }
+
+        public Model MakeSpinObj(Model f, string axis, int segments)
+        {
+            Point3 p1 = new Point3(0, 0, 0);
+            Point3 p2 = new Point3(0, 0, 1);
+            switch (axis)
+            {
+                case "X":
+                    p2 = new Point3(1, 0, 0);
+                    break;
+                case "Y":
+                    p2 = new Point3(0, 1, 0);
+                    break;
+                case "Z":
+                    p2 = new Point3(0, 0, 1);
+                    break;
+            }
+            Polygon foundation = f.Polygons[0];
+            double angle = 2 * Math.PI / segments;
+            Model result = new Model { Name = f.Name + " Spin" };
+            var points = new List<Point3>();
+            var polygons = new List<Polygon>();
+            if (foundation.Points.Count > 3)
+            {
+                for (int i = 0; i < foundation.Points.Count; i++)
+                {
+                    points.Add(new Point3(foundation.Points[i].X, foundation.Points[i].Y, foundation.Points[i].Z));
+                }
+                int index1, index2 = 0;
+                Point3 first_point;
+                List<int> indexes = new List<int>();
+                indexes.Add(0); indexes.Add(1); indexes.Add(2); indexes.Add(3);
+                for (int i = 0; i < segments; i++)
+                {
+                    f.RotateLine(p1, p2, angle);
+                    first_point = foundation.Points[0];
+                    index1 = points.FindIndex(x => x == first_point);
+                    if (index1 == -1)
+                    {
+                        points.Add(new Point3(foundation.Points[0].X, foundation.Points[0].Y, foundation.Points[0].Z));
+                        index1 = points.Count - 1;
+                    }
+                    indexes.Add(index1);
+                    for (int j = 1; j < foundation.Points.Count; j++)
+                    {
+                        index2 = points.FindIndex(x => x == foundation.Points[j]);
+                        if (index2 == -1)
+                        {
+                            points.Add(new Point3(foundation.Points[j].X, foundation.Points[j].Y, foundation.Points[j].Z));
+                            index2 = points.Count - 1;
+                        }
+                        indexes.Add(index2);
+                        var polygon = new Polygon(Color.Black);
+                        polygon.Points.Add(points[index1]);
+                        polygon.Points.Add(points[index2]);
+                        polygon.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
+                        polygon.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 2]]);
+                        index1 = index2;
+
+                        // добавить проверку на повторяющиеся полигоны
+
+                        result.Polygons.Add(polygon);
+                    }
+                }
+                result._points = points;
+                return result;
+            }
+            else
+                return result;
         }
 
         private static float ParseFloat(string str)

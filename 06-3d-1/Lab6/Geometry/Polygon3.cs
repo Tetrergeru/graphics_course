@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 using GraphFunc.Projections;
 
 namespace GraphFunc.Geometry
@@ -22,5 +25,6 @@ namespace GraphFunc.Geometry
                 polygon2.AddPoint(projection.Project(point));
             return polygon2;
         }
+
     }
 }
