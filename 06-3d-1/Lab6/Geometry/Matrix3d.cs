@@ -93,20 +93,20 @@ namespace GraphFunc.Geometry
             return new Matrix3d
             {
                 [0, 0] = (float)(vec.Item1 * vec.Item1 + Math.Cos(angle) * (1 - vec.Item1 * vec.Item1)),
-                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
-                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
-                [0, 3] = 0,
-                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
-                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
-                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
-                [1, 3] = 0,
+                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
                 [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
-                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
-                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
-                [2, 3] = 0,
                 [3, 0] = 0,
+                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
+                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
+                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
                 [3, 1] = 0,
+                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
+                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
                 [3, 2] = 0,
+                [0, 3] = 0,
+                [1, 3] = 0,
+                [2, 3] = 0,
                 [3, 3] = 1
             };
         }
@@ -122,20 +122,20 @@ namespace GraphFunc.Geometry
             return new Matrix3d
             {
                 [0, 0] = (float)(vec.Item1 * vec.Item1 + Math.Cos(angle) * (1 - vec.Item1 * vec.Item1)),
-                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
-                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
-                [0, 3] = 0,
-                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
-                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
-                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
-                [1, 3] = 0,
-                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
-                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
-                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
-                [2, 3] = 0,
+                [1, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 + vec.Item3 * Math.Sin(angle)),
+                [2, 0] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item2 * Math.Sin(angle)),
                 [3, 0] = 0,
+                [0, 1] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item2 - vec.Item3 * Math.Sin(angle)),
+                [1, 1] = (float)(vec.Item2 * vec.Item2 + Math.Cos(angle) * (1 - vec.Item2 * vec.Item2)),
+                [2, 1] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item1 * Math.Sin(angle)),
                 [3, 1] = 0,
+                [0, 2] = (float)(vec.Item1 * (1 - Math.Cos(angle)) * vec.Item3 + vec.Item2 * Math.Sin(angle)),
+                [1, 2] = (float)(vec.Item2 * (1 - Math.Cos(angle)) * vec.Item3 - vec.Item1 * Math.Sin(angle)),
+                [2, 2] = (float)(vec.Item3 * vec.Item3 + Math.Cos(angle) * (1 - vec.Item3 * vec.Item3)),
                 [3, 2] = 0,
+                [0, 3] = 0,
+                [1, 3] = 0,
+                [2, 3] = 0,
                 [3, 3] = 1
             };
         }
