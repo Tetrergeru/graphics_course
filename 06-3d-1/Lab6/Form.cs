@@ -181,6 +181,12 @@ namespace GraphFunc
                 }
                 DrawAll();
             };
+
+            MouseWheel += (sender, args) =>
+            {
+                _model.Scale(args.Delta > 0 ? 1.1f : 0.9f);
+                DrawAll();
+            };
         }
 
         private void DrawAll()
@@ -236,8 +242,8 @@ namespace GraphFunc
         {
             var textBox = new TextBox
             {
-                Left = ScreenWidth + 25 + 10 + 25 * idx,
-                Width = 20,
+                Left = ScreenWidth + 25 + 10 + 35 * idx,
+                Width = 30,
                 Height = 15,
                 Top = top,
                 Text = (idx != 2 ? 0 : top - 25).ToString(),
