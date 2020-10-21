@@ -1,2 +1,2 @@
-F 10 30 up
-F FF-[-F+F+F]+[+F-F-F]
+F 0 25 up
+F F

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using System.Threading;
 namespace GraphFunc.Tools
 {
     class FractalTool : ITool
@@ -20,7 +20,7 @@ namespace GraphFunc.Tools
 
         private const int BottomSpace = 50;
 
-        private Random rand = new Random();
+        private Random rand = new Random(1234567); //25112  312
 
         public void Add(Panel panel)
         {
@@ -52,7 +52,7 @@ namespace GraphFunc.Tools
             panel.Controls.Add(depthLabel);
             var depth = new HScrollBar
             {
-                Minimum = 1,
+                Minimum = 0,
                 Maximum = 15 + 9,
                 Left = 100,
                 Top = panel.Height - BottomSpace + 10,
@@ -199,7 +199,8 @@ namespace GraphFunc.Tools
             var coefY = (double)_picture.Height / (yMax - yMin);
             var coef = Math.Min(coefX, coefY);
 
-            var newPoints = new List<Point>();
+            var newPoints = new List<(Point, int)>();
+            int ind = 1;
             foreach (var t in points)
             {
                 var distX = t.X - pointMiddle.X;
@@ -210,7 +211,8 @@ namespace GraphFunc.Tools
                 var np = windowMiddle;
                 np.X += distX;
                 np.Y += distY;
-                newPoints.Add(np);
+                newPoints.Add((np, Int32.MaxValue));
+                ind++;
             }
 
             if (!WhoCalls)
@@ -221,7 +223,7 @@ namespace GraphFunc.Tools
                 _drawer.Clear(Color.White);
                 _picture.Image = picture;
                 for (var i = 0; i < newPoints.Count - 1; i++)
-                    _drawer.DrawLine(pen, newPoints[i], newPoints[i + 1]);
+                    _drawer.DrawLine(pen, newPoints[i].Item1, newPoints[i + 1].Item1);
             }
             else
             {
@@ -230,37 +232,79 @@ namespace GraphFunc.Tools
                 _drawer = Graphics.FromImage(picture);
                 _drawer.Clear(Color.White);
                 _picture.Image = picture;
+                //newPoints = newPoints.Distinct().ToList();
+                
+                var ordered = newPoints.OrderBy(p => Math.Min(p.Item1.X, picture.Width - p.Item1.X)).ToList();
+               
+                for (int j = 0; j < newPoints.Count; j++)
+                {
+                    for (int i = 0; i < newPoints.Count; i++)
+                        if (ordered[j].Item1.Y == newPoints[i].Item1.Y && ordered[j].Item1.X == newPoints[i].Item1.X)
+                        {
+                            newPoints[i] = (newPoints[i].Item1, j);
+
+                        }
+                }
+
+                int koef = newPoints.Count / 4;
                 for (var i = 0; i < newPoints.Count - 1; i++)
                 {
-                    var penWidth = 20- (newPoints[i].Y / 12);
-                    penWidth = 13 - penWidth - 4;
-                    if (penWidth <= 3)
-                        penWidth = 3;
-                    if (penWidth >= 15)
-                        penWidth = 15;
+                    if (newPoints[i].Item1.Y > picture.Height / 2 + 40)
+                        newPoints[i] = (newPoints[i].Item1, newPoints.Count);
 
-                    var gamma = (double)newPoints[i].Y / _picture.Size.Height;
 
-                    var r1 = Math.Pow(Color.Brown.R / 255.0, gamma);
-                    var r2 = Math.Pow(Color.Green.R / 255.0, gamma);
-                    var rs = (r1 + r2) / 2.0;
-                    var r = 255 * Math.Pow(rs, 1.0 / gamma);
 
-                    var g1 = Math.Pow(Color.Brown.G / 255.0, gamma);
-                    var g2 = Math.Pow(Color.Green.G / 255.0, gamma);
-                    var gs = (g1 + g2) / 2.0;
-                    var g = 255 * Math.Pow(gs, 1.0 / gamma);
+                    int penW = newPoints[i].Item2 * 10 / newPoints.Count;
+                    if (penW > 10)
+                        penW = 10;
+                    if (penW < 3)
+                        penW = 3;
 
-                    var b1 = Math.Pow(Color.Brown.B / 255.0, gamma);
-                    var b2 = Math.Pow(Color.Green.B / 255.0, gamma);
-                    var bs = (b1 + b2) / 2.0;
-                    var b = 255 * Math.Pow(bs, 1.0 / gamma);
 
-                    Color col = Color.FromArgb((int)Math.Round(r), (int)Math.Round(g), (int)Math.Round(b));
-                    pen = new Pen(col, penWidth);
-                    
-                    Console.WriteLine(r);
-                    _drawer.DrawLine(pen, newPoints[i], newPoints[i + 1]);
+                    /* var penW = (newPoints[i].Item1.Y);
+                     penW = penW - 150;
+                     if (penW <= 2)
+                       penW= 2;
+                     if (penW >= 12)
+                     penW = 12;
+
+                     var gamma = (double)newPoints[i].Item1.Y / _picture.Size.Height;
+
+                     var r1 = Math.Pow(Color.Brown.R / 255.0, gamma);
+                     var r2 = Math.Pow(Color.Green.R / 255.0, gamma);
+                     var rs = (r1 + r2) / 2.0;
+                     var r = 255 * Math.Pow(rs, 1.0 / gamma);
+
+                     var g1 = Math.Pow(Color.Brown.G / 255.0, gamma);
+                     var g2 = Math.Pow(Color.Green.G / 255.0, gamma);
+                     var gs = (g1 + g2) / 2.0;
+                     var g = 255 * Math.Pow(gs, 1.0 / gamma);
+
+                     var b1 = Math.Pow(Color.Brown.B / 255.0, gamma);
+                     var b2 = Math.Pow(Color.Green.B / 255.0, gamma);
+                     var bs = (b1 + b2) / 2.0;
+                     var b = 255 * Math.Pow(bs, 1.0 / gamma);
+                     Color col;
+
+                     col = Color.FromArgb((int)Math.Round(r), (int)Math.Round(g), (int)Math.Round(b));*/
+                    if (newPoints[i].Item1.Y < picture.Height / 2 && newPoints[i].Item1.X > 250 && newPoints[i].Item1.X < 400)
+                        penW = 4;
+
+                    if (newPoints[i].Item1.Y < 100)
+                        penW = 3;
+
+
+                    Color col;
+                    if (penW > 7)
+                        col = Color.Brown;
+                    else
+                        col = Color.Green;
+
+                    pen = new Pen(col, penW);
+                   
+                    //Console.WriteLine(newPoints[i].Item2.ToString()+ " (" + newPoints[i].Item1.X + " " + newPoints[i].Item1.Y + ")");
+                    _drawer.DrawLine(pen, newPoints[i].Item1, newPoints[i + 1].Item1);
+                    //Thread.Sleep(1000);
                 }
             }
         }
