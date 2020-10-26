@@ -100,7 +100,7 @@ namespace GraphFunc.Geometry
             return polygon;
         }
 
-        public Model MakeSpinObj(Model f, string axis, int segments)
+        public Model MakeSpinObj(Model base_model, string axis, int segments)
         {
             Point3 p1 = new Point3(0, 0, 0);
             Point3 p2 = new Point3(0, 0, 1);
@@ -116,24 +116,22 @@ namespace GraphFunc.Geometry
                     p2 = new Point3(0, 0, 1);
                     break;
             }
-            Polygon foundation = f.Polygons[0];
+            Polygon foundation = base_model.Polygons[0];
             double angle = 2 * Math.PI / segments;
-            Model result = new Model { Name = f.Name + " Spin" };
+            Model result = new Model { Name = base_model.Name + " Spin" };
             var points = new List<Point3>();
-            var polygons = new List<Polygon>();
             if (foundation.Points.Count > 3)
             {
                 for (int i = 0; i < foundation.Points.Count; i++)
                 {
                     points.Add(new Point3(foundation.Points[i].X, foundation.Points[i].Y, foundation.Points[i].Z));
                 }
-                int index1, index2 = 0;
+                int index1, index2, first_point_index = 0;
                 Point3 first_point;
-                List<int> indexes = new List<int>();
-                indexes.Add(0); indexes.Add(1); indexes.Add(2); indexes.Add(3);
+                List<int> indexes = new List<int> { 0, 1, 2, 3};
                 for (int i = 0; i < segments; i++)
                 {
-                    f.RotateLine(p1, p2, angle);
+                    base_model.RotateLine(p1, p2, angle);
                     first_point = foundation.Points[0];
                     index1 = points.FindIndex(x => x == first_point);
                     if (index1 == -1)
@@ -141,6 +139,7 @@ namespace GraphFunc.Geometry
                         points.Add(new Point3(foundation.Points[0].X, foundation.Points[0].Y, foundation.Points[0].Z));
                         index1 = points.Count - 1;
                     }
+                    first_point_index = index1;
                     indexes.Add(index1);
                     for (int j = 1; j < foundation.Points.Count; j++)
                     {
@@ -162,6 +161,15 @@ namespace GraphFunc.Geometry
 
                         result.Polygons.Add(polygon);
                     }
+                    var poly = new Polygon(Color.Black);
+                    poly.Points.Add(points[index1]);
+                    poly.Points.Add(points[first_point_index]);
+                    poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count]]);
+                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
+
+                    // добавить проверку на повторяющиеся полигоны
+
+                    result.Polygons.Add(poly);
                 }
                 result._points = points;
                 return result;
