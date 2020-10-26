@@ -100,6 +100,31 @@ namespace GraphFunc.Geometry
             return polygon;
         }
 
+        public bool IsNewPolygon(List<Point3> used_points, Polygon p)
+        {
+            Point3 temp;
+            foreach (Point3 point in p.Points)
+            {
+                temp = new Point3(point.X, point.Y, point.Z, point.W);
+                if (used_points.FindIndex(x => x == temp) == -1)
+                    return true;
+            }
+            return false;
+        }
+        public void AddTriangles(ref Model res, List<Point3> points, List<int> indexes, int index1, int index2, int count)
+        {
+            var polygon = new Polygon(Color.Black);
+            polygon.Points.Add(points[index1]);
+            polygon.Points.Add(points[index2]);
+            polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
+                res.Polygons.Add(polygon);
+
+            polygon = new Polygon(Color.Black);
+            polygon.Points.Add(points[index1]);
+            polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
+            polygon.Points.Add(points[indexes[indexes.Count - count - 2]]);
+                res.Polygons.Add(polygon);
+        }
         public Model MakeSpinObj(Model base_model, string axis, int segments)
         {
             Point3 p1 = new Point3(0, 0, 0);
@@ -150,26 +175,21 @@ namespace GraphFunc.Geometry
                             index2 = points.Count - 1;
                         }
                         indexes.Add(index2);
-                        var polygon = new Polygon(Color.Black);
-                        polygon.Points.Add(points[index1]);
-                        polygon.Points.Add(points[index2]);
-                        polygon.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-                        polygon.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 2]]);
+
+                        AddTriangles(ref result, points, indexes, index1, index2, foundation.Points.Count);
                         index1 = index2;
-
-                        // добавить проверку на повторяющиеся полигоны
-
-                        result.Polygons.Add(polygon);
                     }
                     var poly = new Polygon(Color.Black);
                     poly.Points.Add(points[index1]);
                     poly.Points.Add(points[first_point_index]);
                     poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count]]);
+                        result.Polygons.Add(poly);
+
+                    poly = new Polygon(Color.Black);
+                    poly.Points.Add(points[index1]);
                     poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-
-                    // добавить проверку на повторяющиеся полигоны
-
-                    result.Polygons.Add(poly);
+                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
+                        result.Polygons.Add(poly);
                 }
                 result._points = points;
                 return result;
@@ -178,6 +198,7 @@ namespace GraphFunc.Geometry
                 return result;
         }
 
+        
         private static float ParseFloat(string str)
             => float.Parse(str, CultureInfo.InvariantCulture);
     }
