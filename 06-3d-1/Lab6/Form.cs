@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using GraphFunc.Geometry;
@@ -103,7 +104,14 @@ namespace GraphFunc
             var y2Field = ControlBox(100, 1);
             var z2Field = ControlBox(100, 2);
             var segmentsSpin = ControlBox(250, 1);
-
+            
+            var x0FieldGraphic = ControlBox(350, 0);
+            var x1FieldGraphic = ControlBox(350, 1);
+            var y0FieldGraphic = ControlBox(375, 0);
+            var y1FieldGraphic = ControlBox(375, 1);
+            var stepFieldGraphic = ControlBox(425, 0);
+            var funcFieldGraphic = ControlBox2(500, 0);
+            
             var axisSpin = new CheckedListBox()
             {
                 Left = ScreenWidth + 25 + 10,
@@ -219,6 +227,18 @@ namespace GraphFunc
                             _model = temp;
                         }
                         break;
+                    case Keys.G:
+                    {
+                        double x0, x1, y0, y1, step;
+                        Double.TryParse(x0FieldGraphic.Text, out x0);
+                        Double.TryParse(x1FieldGraphic.Text, out x1);
+                        Double.TryParse(y0FieldGraphic.Text, out y0);
+                        Double.TryParse(y1FieldGraphic.Text, out y1);
+                        Double.TryParse(stepFieldGraphic.Text, out step);
+
+                        _model = Model.MakeGraphic(GetFunc(funcFieldGraphic.Text), (float) x0, (float) y0, (float) x1, (float) y1, (float) step);
+                        break;
+                    }
                     case Keys.L:
                     {
                         var dialog = new OpenFileDialog
@@ -254,9 +274,89 @@ namespace GraphFunc
 
             MouseWheel += (sender, args) =>
             {
-                Console.Write("Scroll");
                 _model.ScaleCenter(args.Delta > 0 ? 1.1f : 0.9f);
                 DrawAll();
+            };
+        }
+
+        private Func<float, float, float> GetFunc(string func)
+        {
+            var list = func.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            return (x, y) =>
+            {
+                var stack = new Stack<float>();
+                foreach (var command in list)
+                {
+                    switch (command.ToLower())
+                    {
+                        case "x":
+                            stack.Push(x);
+                            break;
+                        case "y":
+                            stack.Push(y);
+                            break;
+                        case "e":
+                            stack.Push((float) Math.E);
+                            break;
+                        case "pi":
+                            stack.Push((float) Math.PI);
+                            break;
+                        case "+":
+                            stack.Push(stack.Pop() + stack.Pop());
+                            break;
+                        case "--":
+                        {
+                            var b = stack.Pop();
+                            var a = stack.Pop();
+                            stack.Push(a - b);
+                            break;
+                        }
+                        case "*":
+                            stack.Push(stack.Pop() * stack.Pop());
+                            break;
+                        case "-":
+                            stack.Push(-stack.Pop());
+                            break;
+                        case "/":
+                        {
+                            var b = stack.Pop();
+                            var a = stack.Pop();
+                            stack.Push(a / b);
+                            break;
+                        }
+                        case "^":
+                        {
+                            var b = stack.Pop();
+                            var a = stack.Pop();
+                            stack.Push((float) Math.Pow(a, b));
+                            break;
+                        }
+                        case "sin":
+                            stack.Push((float) Math.Sin(stack.Pop()));
+                            break;
+                        case "cos":
+                            stack.Push((float) Math.Cos(stack.Pop()));
+                            break;
+                        case "tg":
+                            stack.Push((float) Math.Tan(stack.Pop()));
+                            break;
+                        case "lg":
+                            stack.Push((float) Math.Log(stack.Pop(), 2));
+                            break;
+                        case "log":
+                        {
+                            var b = stack.Pop();
+                            var a = stack.Pop();
+                            stack.Push((float) Math.Log(a, b));
+                            break;
+                        }
+                        default:
+                            stack.Push(float.Parse(command, new CultureInfo("en-US")));
+                            break;
+                    }
+                }
+
+                return stack.Pop();
             };
         }
 
@@ -322,7 +422,21 @@ namespace GraphFunc
             Controls.Add(textBox);
             return textBox;
         }
-
+        
+        private TextBox ControlBox2(int top, int idx)
+        {
+            var textBox = new TextBox
+            {
+                Left = ScreenWidth + 25 + 10 + 35 * idx,
+                Width = 120,
+                Height = 15,
+                Top = top,
+                Text = "x cos y sin +",
+            };
+            Controls.Add(textBox);
+            return textBox;
+        }
+        
         private void DrawPolygon(Model model, Graphics drawer)
         {
             foreach (var polygon in model.Polygons)

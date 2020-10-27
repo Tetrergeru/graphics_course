@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Windows.Forms;
 
 namespace GraphFunc.Geometry
 {
@@ -37,16 +39,16 @@ namespace GraphFunc.Geometry
 
         public void Scale(float m)
             => Apply(Matrix3d.ScaleMatrix(m));
-        
+
         public void ScaleCenter(float m)
             => Apply(Matrix3d.ScalePointMatrix(Center, m));
-        
+
         public void Move(Point3 delta)
             => Apply(Matrix3d.MoveMatrix(delta));
 
         public void Rotate(Axis axis, float angle)
             => Apply(Matrix3d.RotationMatrix(axis, angle));
-        
+
         public void RotateCenter(Axis axis, float angle)
             => Apply(Matrix3d.RotationCenterMatrix(Center, axis, angle));
 
@@ -55,11 +57,46 @@ namespace GraphFunc.Geometry
 
         public void Reflect(Axis axis)
             => Apply(Matrix3d.ReflectionMatrix(axis));
-        
+
         private void Apply(Matrix3d matrix)
         {
-            foreach(var point in _points)
+            foreach (var point in _points)
                 point.Apply(matrix);
+        }
+
+        public static Model MakeGraphic(Func<float, float, float> f, float x0, float y0, float x1, float y1, float step)
+        {
+            //f = (x, y) => (float)(Math.Sin(x) * Math.Cos(y));
+            var pts = new List<Point3>();
+            Model result = new Model {Name = "Graphic"};
+            //Console.WriteLine(step);
+            for (var x = x0; x < x1 - step; x += step)
+            for (var y = y0; y < y1 - step; y += step)
+            {
+                pts.Add(new Point3(x, y, f(x, y)));
+                pts.Add(new Point3(x + step, y, f(x + step, y)));
+                pts.Add(new Point3(x, y + step, f(x, y + step)));
+
+                var poly = new Polygon(Color.Black, pts);
+
+                poly.Points.Add(pts.Count - 1);
+                poly.Points.Add(pts.Count - 2);
+                poly.Points.Add(pts.Count - 3);
+
+                result.Polygons.Add(poly);
+            }
+
+            result._points = pts;
+            return result;
+        }
+
+        public IEnumerable<string> SaveToObj()
+        {
+            foreach (var point in _points)
+                yield return $"v {point.X} {point.Y} {point.Z}".Replace(',', '.');
+
+            foreach (var polygon in Polygons)
+                yield return $"f {string.Join(" ", polygon.Points.Select(p => $"{p + 1}/"))}";
         }
 
         public static Model LoadFromObj(IEnumerable<string> file, string name)
@@ -72,7 +109,7 @@ namespace GraphFunc.Geometry
                     continue;
                 if (line[0] == '#')
                     continue;
-                var split = line.Split(new []{' '}, StringSplitOptions.RemoveEmptyEntries);
+                var split = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
                 if (split[0] == "v")
                     points.Add(ParsePoint(split));
                 else if (split[0] == "f")
@@ -88,43 +125,48 @@ namespace GraphFunc.Geometry
 
         private static Polygon ParsePolygon(string[] line, List<Point3> points)
         {
-            var polygon = new Polygon(Color.Black);
+            var polygon = new Polygon(Color.Black, points);
             foreach (var str in line.Skip(1))
             {
                 var pointIdx = int.Parse(str.Substring(0, str.IndexOf('/')));
                 if (pointIdx < 0)
                     pointIdx = -pointIdx;
                 pointIdx -= 1;
-                polygon.Points.Add(points[pointIdx]);
+                polygon.Points.Add(pointIdx);
             }
+
             return polygon;
         }
 
         public bool IsNewPolygon(List<Point3> used_points, Polygon p)
         {
             Point3 temp;
-            foreach (Point3 point in p.Points)
+            foreach (var point in p.Points.Select(pointIdx => p.PointList[pointIdx]))
             {
                 temp = new Point3(point.X, point.Y, point.Z, point.W);
                 if (used_points.FindIndex(x => x == temp) == -1)
                     return true;
             }
+
             return false;
         }
-        public void AddTriangles(ref Model res, List<Point3> points, List<int> indexes, int index1, int index2, int count)
-        {
-            var polygon = new Polygon(Color.Black);
-            polygon.Points.Add(points[index1]);
-            polygon.Points.Add(points[index2]);
-            polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
-                res.Polygons.Add(polygon);
 
-            polygon = new Polygon(Color.Black);
-            polygon.Points.Add(points[index1]);
-            polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
-            polygon.Points.Add(points[indexes[indexes.Count - count - 2]]);
-                res.Polygons.Add(polygon);
+        public void AddTriangles(ref Model res, List<Point3> points, List<int> indexes, int index1, int index2,
+            int count)
+        {
+            var polygon = new Polygon(Color.Black, points);
+            polygon.Points.Add(index1);
+            polygon.Points.Add(index2);
+            polygon.Points.Add(indexes[indexes.Count - count - 1]);
+            res.Polygons.Add(polygon);
+
+            polygon = new Polygon(Color.Black, points);
+            polygon.Points.Add(index1);
+            polygon.Points.Add(indexes[indexes.Count - count - 1]);
+            polygon.Points.Add(indexes[indexes.Count - count - 2]);
+            res.Polygons.Add(polygon);
         }
+
         public Model MakeSpinObj(Model base_model, string axis, int segments)
         {
             Point3 p1 = new Point3(0, 0, 0);
@@ -141,83 +183,64 @@ namespace GraphFunc.Geometry
                     p2 = new Point3(0, 0, 1);
                     break;
             }
+
             Polygon foundation = base_model.Polygons[0];
             double angle = 2 * Math.PI / segments;
-            Model result = new Model { Name = base_model.Name + " Spin" };
+            Model result = new Model {Name = base_model.Name + " Spin"};
             var points = new List<Point3>();
             if (foundation.Points.Count > 3)
             {
-                for (int i = 0; i < foundation.Points.Count; i++)
-                {
-                    points.Add(new Point3(foundation.Points[i].X, foundation.Points[i].Y, foundation.Points[i].Z));
-                }
+                points.AddRange(foundation.Points.Select(t => foundation.PointList[t].Moved(0, 0)));
+
                 int index1, index2, first_point_index = 0;
                 Point3 first_point;
-                List<int> indexes = new List<int> { 0, 1, 2, 3};
+                var indexes = new List<int> {0, 1, 2, 3};
                 for (int i = 0; i < segments; i++)
                 {
                     base_model.RotateLine(p1, p2, angle);
-                    first_point = foundation.Points[0];
+                    first_point = foundation.PointList[foundation.Points[0]];
                     index1 = points.FindIndex(x => x == first_point);
                     if (index1 == -1)
                     {
-                        points.Add(new Point3(foundation.Points[0].X, foundation.Points[0].Y, foundation.Points[0].Z));
+                        points.Add(foundation.GetPoint(0).Moved(0, 0));
                         index1 = points.Count - 1;
                     }
+
                     first_point_index = index1;
                     indexes.Add(index1);
                     for (int j = 1; j < foundation.Points.Count; j++)
                     {
-                        index2 = points.FindIndex(x => x == foundation.Points[j]);
+                        index2 = points.FindIndex(x => x == foundation.GetPoint(j));
                         if (index2 == -1)
                         {
-                            points.Add(new Point3(foundation.Points[j].X, foundation.Points[j].Y, foundation.Points[j].Z));
+                            points.Add(foundation.GetPoint(j).Moved(0, 0));
                             index2 = points.Count - 1;
                         }
+
                         indexes.Add(index2);
 
                         AddTriangles(ref result, points, indexes, index1, index2, foundation.Points.Count);
                         index1 = index2;
                     }
-                    var poly = new Polygon(Color.Black);
-                    poly.Points.Add(points[index1]);
-                    poly.Points.Add(points[first_point_index]);
-                    poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count]]);
-                        result.Polygons.Add(poly);
 
-                    poly = new Polygon(Color.Black);
-                    poly.Points.Add(points[index1]);
-                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-                        result.Polygons.Add(poly);
+                    var poly = new Polygon(Color.Black, points);
+                    poly.Points.Add(index1);
+                    poly.Points.Add(first_point_index);
+                    poly.Points.Add(indexes[indexes.Count - 2 * foundation.Points.Count]);
+                    result.Polygons.Add(poly);
+
+                    poly = new Polygon(Color.Black, points);
+                    poly.Points.Add(index1);
+                    poly.Points.Add(indexes[indexes.Count - foundation.Points.Count - 1]);
+                    poly.Points.Add(indexes[indexes.Count - foundation.Points.Count - 1]);
+                    result.Polygons.Add(poly);
                 }
+
                 result._points = points;
                 return result;
             }
             else
                 return result;
-        }
-
-        public static Model MakeGraphic(Func<float, float, float> f, float x0, float y0, float x1, float y1, float step)
-        {
-            f = (x, y) => (float)(Math.Sin(x) * Math.Cos(y));
-            var pts = new List<Point3>();
-            Model result = new Model { Name = "Graphic"};
-            //Console.WriteLine(step);
-            for (var x = x0; x < x1 - step; x += step)
-                for (var y = y0; y < y1 - step; y += step)
-                {
-                    var poly = new Polygon(Color.Black);
-                    poly.Points.Add(new Point3(x, y, f(x, y)));
-                    poly.Points.Add(new Point3(x + step, y, f(x + step, y)));
-                    poly.Points.Add(new Point3(x, y+step, f(x, y + step)));
-
-                    result.Polygons.Add(poly);
-                    pts.Add(new Point3(x, y, f(x, y)));
-                }
-
-            result._points = pts;
-            return result;
         }
 
 
