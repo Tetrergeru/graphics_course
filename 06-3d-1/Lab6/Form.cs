@@ -103,6 +103,12 @@ namespace GraphFunc
             var z2Field = ControlBox(100, 2);
             var segmentsSpin = ControlBox(250, 1);
 
+            var x0FieldGraphic = ControlBox(350, 0);
+            var x1FieldGraphic = ControlBox(350, 1);
+            var y0FieldGraphic = ControlBox(375, 0);
+            var y1FieldGraphic = ControlBox(375, 1);
+            var stepFieldGraphic = ControlBox(425, 0);
+
             var axisSpin = new CheckedListBox()
             {
                 Left = ScreenWidth + 25 + 10,
@@ -215,6 +221,18 @@ namespace GraphFunc
                             temp = _model.MakeSpinObj(_model, axisSpin.CheckedItems[0].ToString(), IntParse(segmentsSpin.Text, 0));
                             _model = temp;
                         }
+                        break;
+                    case Keys.G:
+                    {
+                            double x0, x1, y0, y1, step;
+                            Double.TryParse(x0FieldGraphic.Text, out x0);
+                            Double.TryParse(x1FieldGraphic.Text, out x1);
+                            Double.TryParse(y0FieldGraphic.Text, out y0);
+                            Double.TryParse(y1FieldGraphic.Text, out y1);
+                            Double.TryParse(stepFieldGraphic.Text, out step);
+
+                            _model = Model.MakeGraphic(null, (float)x0, (float)y0, (float)x1, (float)y1, (float)step); 
+                    }
                         break;
                 }
                 DrawAll();

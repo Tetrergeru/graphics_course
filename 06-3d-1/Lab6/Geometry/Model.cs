@@ -198,7 +198,29 @@ namespace GraphFunc.Geometry
                 return result;
         }
 
-        
+        public static Model MakeGraphic(Func<float, float, float> f, float x0, float y0, float x1, float y1, float step)
+        {
+            f = (x, y) => (float)(Math.Sin(x) * Math.Cos(y));
+            var pts = new List<Point3>();
+            Model result = new Model { Name = "Graphic"};
+            //Console.WriteLine(step);
+            for (var x = x0; x < x1 - step; x += step)
+                for (var y = y0; y < y1 - step; y += step)
+                {
+                    var poly = new Polygon(Color.Black);
+                    poly.Points.Add(new Point3(x, y, f(x, y)));
+                    poly.Points.Add(new Point3(x + step, y, f(x + step, y)));
+                    poly.Points.Add(new Point3(x, y+step, f(x, y + step)));
+
+                    result.Polygons.Add(poly);
+                    pts.Add(new Point3(x, y, f(x, y)));
+                }
+
+            result._points = pts;
+            return result;
+        }
+
+
         private static float ParseFloat(string str)
             => float.Parse(str, CultureInfo.InvariantCulture);
     }
