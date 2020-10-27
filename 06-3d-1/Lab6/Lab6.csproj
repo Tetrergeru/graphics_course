@@ -73,7 +73,9 @@
     <None Include="Models\Prism.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Models\Square.obj" />
+    <None Include="Models\Square.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Cat.obj">

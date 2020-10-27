@@ -38,6 +38,11 @@ namespace GraphFunc.Geometry
                 Axis.Z => new Point3(X, Y, Z + distance, W),
             };
 
+        public float Distance(Point3 other)
+        {
+            return (float)Math.Sqrt(Math.Pow(other.X - this.X, 2) + Math.Pow(other.Y - this.Y, 2) + Math.Pow(other.Z- this.Z, 2));
+        }
+
         public override string ToString()
             => $"({X:0.000}, {Y:0.000}, {Z:0.000}, {W:0.000})";
     }

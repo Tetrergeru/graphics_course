@@ -11,15 +11,15 @@ namespace GraphFunc
     public class Form : System.Windows.Forms.Form
     {
         private const int ScreenWidth = 750;
-        
+
         private const int ScreenHeight = 750;
 
         private const int PointPanelWidth = 100;
-        
+
         private const float Max = 20;
-        
+
         private PictureBox _screen;
-        
+
         private readonly List<String> _models = new List<string>
         {
             "Models/Square.obj",
@@ -33,11 +33,11 @@ namespace GraphFunc
             "Models/Prism.obj",
             "Models/Cat.obj",
         };
-        
+
         private int _currentModel;
-        
+
         private Model _model;
-        
+
         private readonly List<IProjection> _projection = new List<IProjection>
         {
             new ProjectionPerspective(),
@@ -50,7 +50,7 @@ namespace GraphFunc
         private int _currentProjection;
 
         private (Point3 from, Point3 to) RotationLine = (new Point3(0, 0, 0), new Point3(0, 0, 75));
-        
+
         public Form()
         {
             KeyPreview = true;
@@ -60,7 +60,7 @@ namespace GraphFunc
             BackColor = Color.Beige;
             _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
             Text = _model.Name;
-            
+
             AddScreen();
             ControlTools();
 
@@ -87,9 +87,10 @@ namespace GraphFunc
                     Text = _models[_currentModel];
                     _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
                 }
+
                 DrawAll();
             };
-            
+
             Controls.Add(_screen);
         }
 
@@ -134,7 +135,7 @@ namespace GraphFunc
                 Top = 130,
                 Text = "Set Points",
             };
-            button.Click += (sender, args) => 
+            button.Click += (sender, args) =>
             {
                 RotationLine = (
                     new Point3(
@@ -145,7 +146,7 @@ namespace GraphFunc
                         IntParse(x2Field.Text, 0),
                         IntParse(y2Field.Text, 0),
                         IntParse(z2Field.Text, 75))
-                    );
+                );
                 DrawAll();
             };
             Controls.Add(button);
@@ -172,22 +173,22 @@ namespace GraphFunc
                         _model.Move(new Point3(0, 0, 1));
                         break;
                     case Keys.Left:
-                        _model.RotateCenter(Axis.Y, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, (float) Math.PI / 12);
                         break;
                     case Keys.Right:
-                        _model.RotateCenter(Axis.Y, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Y, -(float) Math.PI / 12);
                         break;
                     case Keys.Up:
-                        _model.RotateCenter(Axis.X, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, (float) Math.PI / 12);
                         break;
                     case Keys.Down:
-                        _model.RotateCenter(Axis.X, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.X, -(float) Math.PI / 12);
                         break;
                     case Keys.PageUp:
-                        _model.RotateCenter(Axis.Z, (float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, (float) Math.PI / 12);
                         break;
                     case Keys.PageDown:
-                        _model.RotateCenter(Axis.Z, -(float)Math.PI/12);
+                        _model.RotateCenter(Axis.Z, -(float) Math.PI / 12);
                         break;
                     case Keys.F1:
                         _model.Reflect(Axis.X);
@@ -199,29 +200,61 @@ namespace GraphFunc
                         _model.Reflect(Axis.Z);
                         break;
                     case Keys.Z:
-                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
-                        _model.RotateLine(RotationLine.from, RotationLine.to, (float)Math.PI/12);
+                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1),
+                            RotationLine.from.Z * (-1)));
+                        _model.RotateLine(RotationLine.from, RotationLine.to, (float) Math.PI / 12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
                         break;
                     case Keys.X:
-                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1), RotationLine.from.Z * (-1)));
-                        _model.RotateLine(RotationLine.from, RotationLine.to, -(float)Math.PI/12);
+                        _model.Move(new Point3(RotationLine.from.X * (-1), RotationLine.from.Y * (-1),
+                            RotationLine.from.Z * (-1)));
+                        _model.RotateLine(RotationLine.from, RotationLine.to, -(float) Math.PI / 12);
                         _model.Move(new Point3(RotationLine.from.X, RotationLine.from.Y, RotationLine.from.Z));
                         break;
                     case Keys.P:
                         if (_model.Polygons.Count == 1)
                         {
-                            Model temp = new Model();
-                            temp = _model.MakeSpinObj(_model, axisSpin.CheckedItems[0].ToString(), IntParse(segmentsSpin.Text, 0));
+                            var temp = _model.MakeSpinObj(_model, axisSpin.CheckedItems[0].ToString(),
+                                IntParse(segmentsSpin.Text, 0));
                             _model = temp;
                         }
                         break;
+                    case Keys.L:
+                    {
+                        var dialog = new OpenFileDialog
+                        {
+                            InitialDirectory = "c:\\",
+                            RestoreDirectory = true,
+                            ShowHelp = true,
+                        };
+                        var result = dialog.ShowDialog();
+                        if (result != DialogResult.OK || dialog.SafeFileName == null)
+                            break;
+                        _model = Model.LoadFromObj(File.ReadLines(dialog.FileName), dialog.FileName);
+                        break;
+                    }
+                    case Keys.K:
+                    {
+                        var dialog = new SaveFileDialog
+                        {
+                            InitialDirectory = "c:\\",
+                            RestoreDirectory = true,
+                            ShowHelp = true,
+                        };
+                        var result = dialog.ShowDialog();
+                        if (result != DialogResult.OK)
+                            break;
+                        File.WriteAllLines(dialog.FileName, _model.SaveToObj());
+                        break;
+                    }
                 }
+
                 DrawAll();
             };
 
             MouseWheel += (sender, args) =>
             {
+                Console.Write("Scroll");
                 _model.ScaleCenter(args.Delta > 0 ? 1.1f : 0.9f);
                 DrawAll();
             };
@@ -235,37 +268,37 @@ namespace GraphFunc
             {
                 Polygons =
                 {
-                    new Polygon(Color.Red)
+                    new Polygon(Color.Red, new List<Point3>
                     {
-                        Points =
-                        {
-                            new Point3(-Max, 0, 0), 
-                            new Point3(Max, 0, 0)
-                        }
+                        new Point3(-Max, 0, 0),
+                        new Point3(Max, 0, 0)
+                    })
+                    {
+                        Points = {0, 1}
                     },
-                    new Polygon(Color.Blue)
+                    new Polygon(Color.Blue, new List<Point3>
                     {
-                        Points =
-                        {
-                            new Point3(0, -Max,  0), 
-                            new Point3(0, Max, 0)
-                        }
+                        new Point3(0, -Max, 0),
+                        new Point3(0, Max, 0)
+                    })
+                    {
+                        Points = {0, 1}
                     },
-                    new Polygon(Color.Green)
+                    new Polygon(Color.Green, new List<Point3>
                     {
-                        Points =
-                        {
-                            new Point3(0, 0, -Max), 
-                            new Point3(0, 0, Max)
-                        }
+                        new Point3(0, 0, -Max),
+                        new Point3(0, 0, Max)
+                    })
+                    {
+                        Points = {0, 1}
                     },
-                    new Polygon(Color.Purple)
+                    new Polygon(Color.Purple, new List<Point3>
                     {
-                        Points =
-                        {
-                            RotationLine.from, 
-                            RotationLine.to,
-                        }
+                        RotationLine.from,
+                        RotationLine.to,
+                    })
+                    {
+                        Points = {0, 1}
                     },
                 }
             }, drawer);
