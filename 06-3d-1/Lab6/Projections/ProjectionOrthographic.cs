@@ -22,7 +22,7 @@ namespace GraphFunc.Projections
                 float.PositiveInfinity);
         }
 
-        public PointF? Project(Point3 point)
+        public PointF Project(Point3 point)
             => _projector.Project(point);
     }
 }

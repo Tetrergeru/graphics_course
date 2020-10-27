@@ -5,6 +5,6 @@ namespace GraphFunc.Projections
 {
     public interface IProjection
     {
-        PointF? Project(Point3 point);
+        PointF Project(Point3 point);
     }
 }

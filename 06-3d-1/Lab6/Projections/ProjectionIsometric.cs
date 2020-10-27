@@ -15,7 +15,7 @@ namespace GraphFunc.Projections
             .ClearAxis(Axis.Z)
             ;
         
-        public PointF? Project(Point3 point)
+        public PointF Project(Point3 point)
         {
             var point3 = Matrix.Multiply(point);
             return new PointF(point3.X, point3.Y);

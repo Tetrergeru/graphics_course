@@ -11,7 +11,7 @@ namespace GraphFunc.Projections
             new Point3(0, 0, 0),
             20);
 
-        public PointF? Project(Point3 point)
+        public PointF Project(Point3 point)
             => Projector.Project(point);
     }
 }
