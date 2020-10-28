@@ -23,16 +23,16 @@ namespace GraphFunc
 
         private readonly List<String> _models = new List<string>
         {
-            "Models/Square.obj",
-            "Models/Tetrahedron.obj",
-            "Models/Hexahedron.obj",
-            "Models/Octahedron.obj",
-            "Models/Dodecahedron.obj",
-            "Models/Icosahedron.obj",
+            //"Models/Square.obj",
+            //"Models/Tetrahedron.obj",
+            //"Models/Hexahedron.obj",
+            //"Models/Octahedron.obj",
+            //"Models/Dodecahedron.obj",
+            //"Models/Icosahedron.obj",
             "Models/Cube.obj",
-            "Models/Skull.obj",
-            "Models/Prism.obj",
-            "Models/Cat.obj",
+            //"Models/Skull.obj",
+            //"Models/Prism.obj",
+            //"Models/Cat.obj",
         };
 
         private int _currentModel;
@@ -42,10 +42,10 @@ namespace GraphFunc
         private readonly List<IProjection> _projection = new List<IProjection>
         {
             new ProjectionPerspective(),
-            new ProjectionIsometric(),
-            new ProjectionOrthographic(Axis.Z),
-            new ProjectionOrthographic(Axis.Y),
-            new ProjectionOrthographic(Axis.X),
+            //new ProjectionIsometric(),
+            //new ProjectionOrthographic(Axis.Z),
+            //new ProjectionOrthographic(Axis.Y),
+            //new ProjectionOrthographic(Axis.X),
         };
 
         private int _currentProjection;
@@ -163,16 +163,20 @@ namespace GraphFunc
                 switch (args.KeyCode)
                 {
                     case Keys.W:
-                        _model.Move(new Point3(0, -1, 0));
+                        //_model.Move(new Point3(0, -1, 0));
+                        ProjectionPerspective.Projector.Move(Axis.Z, 0.5f);
                         break;
                     case Keys.S:
-                        _model.Move(new Point3(0, 1, 0));
+                        //_model.Move(new Point3(0, 1, 0));
+                        ProjectionPerspective.Projector.Move(Axis.Z, -0.5f);
                         break;
                     case Keys.A:
-                        _model.Move(new Point3(-1, 0, 0));
+                        //_model.Move(new Point3(-1, 0, 0));
+                        ProjectionPerspective.Projector.Move(Axis.X, -0.5f);
                         break;
                     case Keys.D:
-                        _model.Move(new Point3(1, 0, 0));
+                        //_model.Move(new Point3(1, 0, 0));
+                        ProjectionPerspective.Projector.Move(Axis.X, 0.5f);
                         break;
                     case Keys.Q:
                         _model.Move(new Point3(0, 0, -1));
@@ -181,16 +185,20 @@ namespace GraphFunc
                         _model.Move(new Point3(0, 0, 1));
                         break;
                     case Keys.Left:
-                        _model.RotateCenter(Axis.Y, (float) Math.PI / 12);
+                        //_model.RotateCenter(Axis.Y, (float) Math.PI / 12);
+                        ProjectionPerspective.Projector.Rotate(Axis.Y, -(float)Math.PI/100);
                         break;
                     case Keys.Right:
-                        _model.RotateCenter(Axis.Y, -(float) Math.PI / 12);
+                        //_model.RotateCenter(Axis.Y, -(float) Math.PI / 12);
+                        ProjectionPerspective.Projector.Rotate(Axis.Y, (float)Math.PI/100);
                         break;
                     case Keys.Up:
-                        _model.RotateCenter(Axis.X, (float) Math.PI / 12);
+                        //_model.RotateCenter(Axis.X, (float) Math.PI / 12);
+                        ProjectionPerspective.Projector.Rotate(Axis.X, -(float)Math.PI/100);
                         break;
                     case Keys.Down:
-                        _model.RotateCenter(Axis.X, -(float) Math.PI / 12);
+                        //_model.RotateCenter(Axis.X, -(float) Math.PI / 12);
+                        ProjectionPerspective.Projector.Rotate(Axis.X, (float)Math.PI/100);
                         break;
                     case Keys.PageUp:
                         _model.RotateCenter(Axis.Z, (float) Math.PI / 12);

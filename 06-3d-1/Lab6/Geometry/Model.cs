@@ -66,10 +66,8 @@ namespace GraphFunc.Geometry
 
         public static Model MakeGraphic(Func<float, float, float> f, float x0, float y0, float x1, float y1, float step)
         {
-            //f = (x, y) => (float)(Math.Sin(x) * Math.Cos(y));
             var pts = new List<Point3>();
             Model result = new Model {Name = "Graphic"};
-            //Console.WriteLine(step);
             for (var x = x0; x < x1 - step; x += step)
             for (var y = y0; y < y1 - step; y += step)
             {
@@ -169,20 +167,13 @@ namespace GraphFunc.Geometry
 
         public Model MakeSpinObj(Model base_model, string axis, int segments)
         {
-            Point3 p1 = new Point3(0, 0, 0);
-            Point3 p2 = new Point3(0, 0, 1);
-            switch (axis)
+            var p1 = new Point3(0, 0, 0);
+            var p2 = axis switch
             {
-                case "X":
-                    p2 = new Point3(1, 0, 0);
-                    break;
-                case "Y":
-                    p2 = new Point3(0, 1, 0);
-                    break;
-                case "Z":
-                    p2 = new Point3(0, 0, 1);
-                    break;
-            }
+                "X" => new Point3(1, 0, 0),
+                "Y" => new Point3(0, 1, 0),
+                "Z" => new Point3(0, 0, 1),
+            };
 
             Polygon foundation = base_model.Polygons[0];
             double angle = 2 * Math.PI / segments;
