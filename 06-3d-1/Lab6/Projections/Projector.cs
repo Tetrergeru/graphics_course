@@ -63,15 +63,15 @@ namespace GraphFunc.Projections
         public PointF? Project(Point3 point)
         {
             var point3 = _matrix.Multiply(point);
-            if (point.Distance(_transform) < 1)
+            if (point.Distance(_transform) < 1 || point3.Z < -_screenDistance)
                 return null;
 
             if (float.IsInfinity(ScreenDistance))
                 return new PointF(point3.X, point3.Y);
 
             var result = new PointF(
-                point3.X * ScreenDistance / Math.Abs(point3.Z + ScreenDistance),
-                point3.Y * ScreenDistance / Math.Abs(point3.Z + ScreenDistance));
+                point3.X * ScreenDistance / (point3.Z + ScreenDistance),
+                point3.Y * ScreenDistance / (point3.Z + ScreenDistance));
 
             if (float.IsNaN(result.X) ||
                 float.IsNaN(result.X) ||
@@ -87,10 +87,11 @@ namespace GraphFunc.Projections
             _matrix = Matrix3d
                     .One
                     .Move(new Point3(-Location.X, -Location.Y, -Location.Z))
+                    .Move(new Point3(0, 0, _screenDistance))
                     .Rotate(Axis.X, Transform.X)
                     .Rotate(Axis.Y, Transform.Y)
                     .Rotate(Axis.Z, Transform.Z)
-                    //.Move(new Point3(Location.X, Location.Y, Location.Z))
+                    .Move(new Point3(0, 0, -_screenDistance))
                 ;
         }
     }
