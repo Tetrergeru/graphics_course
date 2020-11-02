@@ -6,5 +6,7 @@ namespace GraphFunc.Projections
     public interface IProjection
     {
         PointF? Project(Point3 point);
+
+        Matrix3d GetMatrix();
     }
 }

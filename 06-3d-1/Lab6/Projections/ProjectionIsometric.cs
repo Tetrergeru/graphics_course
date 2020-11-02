@@ -20,5 +20,8 @@ namespace GraphFunc.Projections
             var point3 = Matrix.Multiply(point);
             return new PointF(point3.X, point3.Y);
         }
+
+        public Matrix3d GetMatrix()
+            => Matrix;
     }
 }

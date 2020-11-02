@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Drawers\IDrawer.cs" />
     <Compile Include="Drawers\StickDrawer.cs" />
+    <Compile Include="Drawers\ZBufferDrawer.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>

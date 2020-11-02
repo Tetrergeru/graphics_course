@@ -56,13 +56,14 @@ namespace GraphFunc
 
         public Form()
         {
+            _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
+            
             KeyPreview = true;
             Width = ScreenWidth + PointPanelWidth + 50 + 19;
             Height = ScreenHeight + 50 + 27;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             BackColor = Color.Beige;
             Text = _model.Name;
-            _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
 
             AddScreen();
             ControlTools();
@@ -202,47 +203,41 @@ namespace GraphFunc
 
         private void DrawAll()
         {
+            var coordinates = new Model();
+            coordinates.Points = new List<Point3>
+            {
+                new Point3(-Max, 0, 0),
+                new Point3(Max, 0, 0),
+                new Point3(0, -Max, 0),
+                new Point3(0, Max, 0),
+                new Point3(0, 0, -Max),
+                new Point3(0, 0, Max),
+                RotationLine.from,
+                RotationLine.to,
+            };
+            coordinates.Polygons = new List<Polygon>
+            {
+                new Polygon(Color.Red)
+                {
+                    Points = {0, 1}
+                },
+                new Polygon(Color.Blue)
+                {
+                    Points = {2, 3}
+                },
+                new Polygon(Color.Green)
+                {
+                    Points = {4, 5}
+                },
+                new Polygon(Color.Purple)
+                {
+                    Points = {6, 7}
+                },
+            };
             DrawModels(new[]
             {
-                new Model
-                {
-                    Polygons =
-                    {
-                        new Polygon(Color.Red, new List<Point3>
-                        {
-                            new Point3(-Max, 0, 0),
-                            new Point3(Max, 0, 0)
-                        })
-                        {
-                            Points = {0, 1}
-                        },
-                        new Polygon(Color.Blue, new List<Point3>
-                        {
-                            new Point3(0, -Max, 0),
-                            new Point3(0, Max, 0)
-                        })
-                        {
-                            Points = {0, 1}
-                        },
-                        new Polygon(Color.Green, new List<Point3>
-                        {
-                            new Point3(0, 0, -Max),
-                            new Point3(0, 0, Max)
-                        })
-                        {
-                            Points = {0, 1}
-                        },
-                        new Polygon(Color.Purple, new List<Point3>
-                        {
-                            RotationLine.from,
-                            RotationLine.to,
-                        })
-                        {
-                            Points = {0, 1}
-                        },
-                    }
-                },
-                _model
+                coordinates,
+                _model,
             });
         }
 

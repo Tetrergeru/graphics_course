@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
-using System.Windows.Forms;
 
 namespace GraphFunc.Geometry
 {
     public class Model
     {
-        private List<Point3> _points;
+        public List<Point3> Points;
 
         public string Name = "";
 
-        public readonly List<Polygon> Polygons = new List<Polygon>();
+        public List<Polygon> Polygons = new List<Polygon>();
 
         public Point3 Center
         {
             get
             {
                 var sum = new Point3(0, 0, 0);
-                foreach (var point in _points)
+                foreach (var point in Points)
                 {
                     sum.X += point.X;
                     sum.Y += point.Y;
                     sum.Z += point.Z;
                 }
 
-                sum.X /= _points.Count;
-                sum.Y /= _points.Count;
-                sum.Z /= _points.Count;
+                sum.X /= Points.Count;
+                sum.Y /= Points.Count;
+                sum.Z /= Points.Count;
                 Console.WriteLine(sum);
                 return sum;
             }
@@ -60,8 +57,18 @@ namespace GraphFunc.Geometry
 
         private void Apply(Matrix3d matrix)
         {
-            foreach (var point in _points)
+            foreach (var point in Points)
                 point.Apply(matrix);
+        }
+
+        private Model Applied(Matrix3d matrix)
+        {
+            var model = new Model
+            {
+                Points = Points.Select(matrix.Multiply).ToList(),
+                Polygons = Polygons
+            };
+            return model;
         }
 
         public static Model MakeGraphic(Func<float, float, float> f, float x0, float y0, float x1, float y1, float step)
@@ -75,7 +82,7 @@ namespace GraphFunc.Geometry
                 pts.Add(new Point3(x + step, y, f(x + step, y)));
                 pts.Add(new Point3(x, y + step, f(x, y + step)));
 
-                var poly = new Polygon(Color.Black, pts);
+                var poly = new Polygon(Color.Black);
 
                 poly.Points.Add(pts.Count - 1);
                 poly.Points.Add(pts.Count - 2);
@@ -84,13 +91,13 @@ namespace GraphFunc.Geometry
                 result.Polygons.Add(poly);
             }
 
-            result._points = pts;
+            result.Points = pts;
             return result;
         }
 
         public IEnumerable<string> SaveToObj()
         {
-            foreach (var point in _points)
+            foreach (var point in Points)
                 yield return $"v {point.X} {point.Y} {point.Z}".Replace(',', '.');
 
             foreach (var polygon in Polygons)
@@ -114,7 +121,7 @@ namespace GraphFunc.Geometry
                     model.Polygons.Add(ParsePolygon(split, points));
             }
 
-            model._points = points;
+            model.Points = points;
             return model;
         }
 
@@ -123,7 +130,7 @@ namespace GraphFunc.Geometry
 
         private static Polygon ParsePolygon(string[] line, List<Point3> points)
         {
-            var polygon = new Polygon(Color.Black, points);
+            var polygon = new Polygon(Color.Black);
             foreach (var str in line.Skip(1))
             {
                 var pointIdx = int.Parse(str.Substring(0, str.IndexOf('/')));
@@ -139,7 +146,7 @@ namespace GraphFunc.Geometry
         public bool IsNewPolygon(List<Point3> used_points, Polygon p)
         {
             Point3 temp;
-            foreach (var point in p.Points.Select(pointIdx => p.PointList[pointIdx]))
+            foreach (var point in p.Points.Select(pointIdx => used_points[pointIdx]))
             {
                 temp = new Point3(point.X, point.Y, point.Z, point.W);
                 if (used_points.FindIndex(x => x == temp) == -1)
@@ -152,13 +159,13 @@ namespace GraphFunc.Geometry
         public void AddTriangles(ref Model res, List<Point3> points, List<int> indexes, int index1, int index2,
             int count)
         {
-            var polygon = new Polygon(Color.Black, points);
+            var polygon = new Polygon(Color.Black);
             polygon.Points.Add(index1);
             polygon.Points.Add(index2);
             polygon.Points.Add(indexes[indexes.Count - count - 1]);
             res.Polygons.Add(polygon);
 
-            polygon = new Polygon(Color.Black, points);
+            polygon = new Polygon(Color.Black);
             polygon.Points.Add(index1);
             polygon.Points.Add(indexes[indexes.Count - count - 1]);
             polygon.Points.Add(indexes[indexes.Count - count - 2]);
@@ -181,7 +188,7 @@ namespace GraphFunc.Geometry
             var points = new List<Point3>();
             if (foundation.Points.Count > 3)
             {
-                points.AddRange(foundation.Points.Select(t => foundation.PointList[t].Moved(0, 0)));
+                points.AddRange(foundation.Points.Select(t => base_model.Points[t].Moved(0, 0)));
 
                 int index1, index2, first_point_index = 0;
                 Point3 first_point;
@@ -189,11 +196,11 @@ namespace GraphFunc.Geometry
                 for (int i = 0; i < segments; i++)
                 {
                     base_model.RotateLine(p1, p2, angle);
-                    first_point = foundation.PointList[foundation.Points[0]];
+                    first_point = base_model.Points[foundation.Points[0]];
                     index1 = points.FindIndex(x => x == first_point);
                     if (index1 == -1)
                     {
-                        points.Add(foundation.GetPoint(0).Moved(0, 0));
+                        points.Add(foundation.GetPoint(0, base_model.Points).Moved(0, 0));
                         index1 = points.Count - 1;
                     }
 
@@ -201,10 +208,10 @@ namespace GraphFunc.Geometry
                     indexes.Add(index1);
                     for (int j = 1; j < foundation.Points.Count; j++)
                     {
-                        index2 = points.FindIndex(x => x == foundation.GetPoint(j));
+                        index2 = points.FindIndex(x => x == foundation.GetPoint(j, base_model.Points));
                         if (index2 == -1)
                         {
-                            points.Add(foundation.GetPoint(j).Moved(0, 0));
+                            points.Add(foundation.GetPoint(j, base_model.Points).Moved(0, 0));
                             index2 = points.Count - 1;
                         }
 
@@ -214,20 +221,20 @@ namespace GraphFunc.Geometry
                         index1 = index2;
                     }
 
-                    var poly = new Polygon(Color.Black, points);
+                    var poly = new Polygon(Color.Black);
                     poly.Points.Add(index1);
                     poly.Points.Add(first_point_index);
                     poly.Points.Add(indexes[indexes.Count - 2 * foundation.Points.Count]);
                     result.Polygons.Add(poly);
 
-                    poly = new Polygon(Color.Black, points);
+                    poly = new Polygon(Color.Black);
                     poly.Points.Add(index1);
                     poly.Points.Add(indexes[indexes.Count - foundation.Points.Count - 1]);
                     poly.Points.Add(indexes[indexes.Count - foundation.Points.Count - 1]);
                     result.Polygons.Add(poly);
                 }
 
-                result._points = points;
+                result.Points = points;
                 return result;
             }
             else
