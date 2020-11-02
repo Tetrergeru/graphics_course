@@ -165,14 +165,14 @@ namespace GraphFunc.Geometry
             res.Polygons.Add(polygon);
         }
 
-        public Model MakeSpinObj(Model base_model, string axis, int segments)
+        public Model MakeSpinObj(Model base_model, Axis axis, int segments)
         {
             var p1 = new Point3(0, 0, 0);
             var p2 = axis switch
             {
-                "X" => new Point3(1, 0, 0),
-                "Y" => new Point3(0, 1, 0),
-                "Z" => new Point3(0, 0, 1),
+                Axis.X => new Point3(1, 0, 0),
+                Axis.Y => new Point3(0, 1, 0),
+                Axis.Z => new Point3(0, 0, 1),
             };
 
             Polygon foundation = base_model.Polygons[0];

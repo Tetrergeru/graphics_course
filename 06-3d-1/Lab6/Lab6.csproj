@@ -48,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawers\IDrawer.cs" />
+    <Compile Include="Drawers\StickDrawer.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +69,7 @@
     <Compile Include="Projections\ProjectionOrthographic.cs" />
     <Compile Include="Projections\ProjectionPerspective.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
