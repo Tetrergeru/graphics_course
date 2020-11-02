@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Security.Permissions;
 
 namespace GraphFunc.Geometry
 {
-    public class Point3
+    public struct Point3
     {
         public float X;
 
@@ -45,5 +48,20 @@ namespace GraphFunc.Geometry
 
         public override string ToString()
             => $"({X:0.000}, {Y:0.000}, {Z:0.000}, {W:0.000})";
+
+        private const float Tolerance = 0.0001f;
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Point3 point3) 
+                return this == point3;
+            return false;
+        }
+        
+        public static bool operator ==(Point3 self, Point3 other)
+            => Math.Abs(self.X - other.X) < Tolerance && Math.Abs(self.Y - other.Y) < Tolerance && Math.Abs(self.Z - other.Z) < Tolerance;
+
+        public static bool operator !=(Point3 self, Point3 other) 
+            => !(self == other);
     }
 }

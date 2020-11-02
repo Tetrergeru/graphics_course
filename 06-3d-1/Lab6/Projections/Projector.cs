@@ -9,6 +9,8 @@ namespace GraphFunc.Projections
     {
         private Matrix3d _matrix;
 
+        public Matrix3d Matrix => _matrix;
+        
         private Point3 _location;
 
         private Point3 _transform;

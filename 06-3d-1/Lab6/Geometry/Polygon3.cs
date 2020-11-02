@@ -12,21 +12,18 @@ namespace GraphFunc.Geometry
     {
         public Color Color;
         
-        public List<Point3> PointList;
-        
         public readonly List<int> Points = new List<int>();
-        public Point3 GetPoint(int i) => PointList[Points[i]];
+        public Point3 GetPoint(int i, IList<Point3> pointList) => pointList[Points[i]];
         
-        public Polygon(Color c, List<Point3> pointList)
+        public Polygon(Color c)
         {
             Color = c;
-            PointList = pointList;
         }
 
-        public Polygon2 Project(IProjection projection)
+        public Polygon2 Project(IProjection projection, IList<Point3> pointList)
         {
             var polygon2 = new Polygon2();
-            foreach (var projected in Points.Select(i => projection.Project(PointList[i])).Where(projected => projected != null))
+            foreach (var projected in Points.Select(i => projection.Project(pointList[i])).Where(projected => projected != null))
                 polygon2.AddPoint((PointF)projected);
 
             return polygon2;
