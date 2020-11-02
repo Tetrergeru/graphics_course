@@ -234,6 +234,79 @@ namespace GraphFunc.Geometry
                 return result;
         }
 
+        public List<Point3> GetMagnitudes()
+        {
+            var magnitudes = new List<Point3>();
+            for (int i = 0; i < Polygons.Count; i++)
+            {
+                var mag = Magnitude(Polygons[i].PointList[2], Polygons[i].PointList[0], Polygons[i].PointList[1], Polygons[i].PointList[0]);
+                magnitudes.Add(mag);
+            }
+            return magnitudes;
+        }
+
+        public Point3 Vector(Point3 v_start, Point3 v_fin)
+        {
+            var vec = new Point3(v_start.X - v_fin.X, v_start.Y - v_fin.Y, v_start.Z - v_fin.Z);
+            return vec;
+        }
+
+        public Point3 Cross(Point3 v1_start, Point3 v1_fin, Point3 v2_start, Point3 v2_fin)
+        {
+            var vec1 = Vector(v1_start, v1_fin);
+            var vec2 = Vector(v2_start, v2_fin);
+
+            var result = new Point3(0, 0, 0);
+            result.X = (vec1.Y * vec2.Z) - (vec1.Z * vec2.Y);
+            result.Y = (vec1.Z * vec2.X) - (vec1.X * vec2.Z);
+            result.Z = (vec1.X * vec2.Y) - (vec1.Y * vec2.X);
+
+            return result;//на самом деле это вектор
+        }
+
+        public float Length(Point3 vec)
+        {
+            return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
+        }
+
+        public Point3 Normalize(Point3 vec)
+        {
+            var magnitude = Length(vec);
+
+            vec.X /= magnitude;
+            vec.Y /= magnitude;
+            vec.Z /= magnitude;
+
+            return vec;
+        }
+
+        public Point3 Magnitude(Point3 v1_start, Point3 v1_fin, Point3 v2_start, Point3 v2_fin)
+        {
+            var mag = Cross(v1_start, v1_fin, v2_start, v2_fin);
+            mag = Normalize(mag);
+
+            return mag;
+        }
+
+        public bool IsVisible(Point3 vec1_start, Point3 vec1_fin, Point3 vec2)
+        {
+            var vec1 = Vector(vec1_start, vec1_fin);
+            vec1 = Normalize(vec1);
+
+            var cos = VecMult(vec1, vec2) / (Length(vec1) * Length(vec2));
+
+            var angle = Math.Acos(cos);
+
+            if (angle < (Math.PI / 2))
+                return true;
+            else
+                return false;
+        }
+
+        public float VecMult(Point3 vec1, Point3 vec2)
+        {
+            return vec1.X * vec2.X + vec1.Y + vec2.Y + vec1.Z + vec2.Z;
+        }
 
         private static float ParseFloat(string str)
             => float.Parse(str, CultureInfo.InvariantCulture);
