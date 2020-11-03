@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using GraphFunc.Geometry;
 using GraphFunc.Projections;
@@ -9,8 +10,11 @@ namespace GraphFunc.Drawers
 {
     public class ZBufferDrawer : IDrawer
     {
+        private List<string> file = new List<string>();
+        
         public void Draw(Graphics drawer, Point screenSize, IEnumerable<Model> models, IProjection projection)
         {
+            file = new List<string>();
             var image = new Bitmap(screenSize.X, screenSize.Y);
             var matrix = new float[screenSize.X * screenSize.Y];
             for (var i = 0; i < screenSize.X * screenSize.Y; i++)
@@ -18,12 +22,13 @@ namespace GraphFunc.Drawers
             foreach (var model in models)
             {
                 var projected = model.Applied(projection);
-                foreach (var polygon in projected.Polygons)
+                for (var i = 0; i < model.Polygons.Count; i++)
                 {
+                    var polygon = model.Polygons[i];
                     var (a, b, c) = (
-                        polygon.GetPoint(0, projected.Points),
-                        polygon.GetPoint(1, projected.Points),
-                        polygon.GetPoint(2, projected.Points));
+                        polygon.GetPoint(0, model.Points),
+                        polygon.GetPoint(1, model.Points),
+                        polygon.GetPoint(2, model.Points));
                     foreach (var (x, y, z) in Rasterize(a, b, c))
                     {
                         var newX = x + screenSize.X / 2;
@@ -36,6 +41,8 @@ namespace GraphFunc.Drawers
                         if (matrix[idx] > z)
                             matrix[idx] = z;
                     }
+
+                    break;
                 }
             }
 
@@ -55,11 +62,12 @@ namespace GraphFunc.Drawers
             }
 
             drawer.DrawImage(image, 0, 0, screenSize.X, screenSize.Y);
+            File.WriteAllLines("test.csv", file);
         }
 
         private IEnumerable<(int, int, float)> Rasterize(Point3 a, Point3 b, Point3 c)
         {
-            if (Math.Abs(a.Y - b.Y) < 0.0001 && Math.Abs(b.Y - c.Y) < 0.0001)
+            if (Math.Abs(a.Y - b.Y) < 0.000001 && Math.Abs(b.Y - c.Y) < 0.000001)
                 yield break;
             if (a.Y < b.Y)
                 (a, b) = (b, a);
@@ -76,26 +84,45 @@ namespace GraphFunc.Drawers
             var (ml, mr) = b.X < c.X
                 ? (b, m)
                 : (m, b);
-
+            Console.WriteLine($"diff: {diff}");
+            //Console.WriteLine($"a: {a}, b: {b}, c: {c}");
             foreach (var p in TopTriangle(a, ml, mr))
                 yield return p;
             foreach (var p in BottomTriangle(ml, mr, c))
                 yield return p;
+            Console.WriteLine($"m: {m}");
         }
 
         private IEnumerable<(int, int, float)> TopTriangle(Point3 t, Point3 bl, Point3 br)
         {
+            Console.WriteLine($"a: {t}, b: {bl}, c: {br}");
             t.Y = (float) Math.Floor(t.Y);
             bl.Y = (float) Math.Ceiling(bl.Y);
             var height = (float) Math.Ceiling (t.Y - bl.Y);
-            var width = (float) Math.Ceiling(br.X - bl.X);
             var leftStep = (bl.X - t.X) / height;
             var rightStep = (br.X - t.X) / height;
+            
+            var leftZStep = (-t.Z + bl.Z) / height;
+            var rightZStep = (-t.Z + br.Z) / height;
+            var leftZ = t.Z;
+            var rightZ = t.Z;
             for (var i = 0; i < height; i++)
-            for (var j = (int) Math.Floor(t.X + i * leftStep); j < (int) Math.Ceiling(t.X + i * rightStep + 1); j++)
             {
-                var depthHor = (br.Z - bl.Z) * (j - bl.X) / width;
-                yield return (j, (int) t.Y - i,  float.PositiveInfinity);//(depthHor - t.Z) * (t.Y - i) / height
+                file.Add("");
+                var currentY = Interpolate(t.Y, bl.Y, i, (int)height);
+                var jStart = (int) Math.Floor(t.X + i * leftStep);
+                var jFinish = (int) Math.Ceiling(t.X + i * rightStep);
+                for (var j = jStart; j < jFinish; j++)
+                {
+                    var horizontalZStep = rightZ - leftZ;
+                    var horizontalOffset = ((float)j - jStart) / (jFinish - jStart);
+                    var z = leftZ - horizontalOffset * horizontalZStep;
+                    file[file.Count - 1] = file[file.Count -1 ] + $" {z}";
+                    yield return (j, (int) t.Y - i, z);
+                }
+                leftZ += leftZStep;
+                rightZ += rightZStep;
+                Console.WriteLine($"leftZ: {leftZ}, rightZ: {rightZ}");
             }
         }
 
@@ -104,15 +131,33 @@ namespace GraphFunc.Drawers
             tl.Y = (float) Math.Ceiling(tl.Y);
             b.Y = (float) Math.Ceiling(b.Y);
             var height = (float) Math.Ceiling(tl.Y - b.Y);
-            var width = (float) Math.Ceiling(tr.X - tl.X);
             var leftStep = (b.X - tl.X) / height;
             var rightStep = (b.X - tr.X) / height;
+            
+            var leftZStep = (b.Z - tl.Z) / height;
+            var rightZStep = -(b.Z - tr.Z) / height;
+            var leftZ = tl.Z;
+            var rightZ = tr.Z;
             for (var i = 0; i < (int) height; i++)
-            for (var j = (int) Math.Floor(tl.X + i * leftStep); j < (int) Math.Ceiling(tr.X + i * rightStep + 1); j++)
             {
-                var depthHor = (tr.Z - tl.Z) * (j - tl.X) / width;
-                yield return (j, (int) tl.Y - i, i);//(depthHor - b.Z) * (b.Y - i) / height
+                file.Add("");
+                var jStart = (int) Math.Floor(tl.X + i * leftStep);
+                var jFinish = (int) Math.Ceiling(tr.X + i * rightStep);
+                for (var j = jStart; j < jFinish; j++)
+                {
+                    var horizontalZStep = rightZ - leftZ;
+                    var horizontalOffset = ((float)j - jStart) / (jFinish - jStart);
+                    var z = leftZ - horizontalOffset * horizontalZStep;
+                    file[file.Count - 1] = file[file.Count -1 ] + $" {z}";
+                    yield return (j, (int) tl.Y - i, z);
+                }
+
+                leftZ += leftZStep;
+                rightZ += rightZStep;
             }
         }
+
+        private float Interpolate(float begin, float end, int idx, int steps)
+            => begin + idx * (end - begin) / steps;
     }
 }

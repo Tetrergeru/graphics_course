@@ -65,11 +65,11 @@ namespace GraphFunc.Projections
         public Point3? Project3(Point3 point)
         {
             var point3 = _matrix.Multiply(point);
-            if (point.Distance(_transform) < 1 || point3.Z < -_screenDistance)
+            if (point3.Z < -_screenDistance)
                 return null;
 
             if (float.IsInfinity(ScreenDistance))
-                return point;
+                return new Point3(point3.X, point3.Y, point.Z);
 
             var result = new Point3(
                 point3.X * ScreenDistance / (point3.Z + ScreenDistance),

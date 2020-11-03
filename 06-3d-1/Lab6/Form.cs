@@ -41,9 +41,9 @@ namespace GraphFunc
 
         private readonly List<IProjection> _projection = new List<IProjection>
         {
-            new ProjectionPerspective(),
-            new ProjectionIsometric(),
-            //new ProjectionOrthographic(Axis.Z),
+            //new ProjectionPerspective(),
+            //new ProjectionIsometric(),
+            new ProjectionOrthographic(Axis.Z),
             //new ProjectionOrthographic(Axis.Y),
             //new ProjectionOrthographic(Axis.X),
         };
@@ -58,6 +58,7 @@ namespace GraphFunc
         {
             _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
             _model.ScaleCenter(100);
+            _model.RotateCenter(Axis.Z, (float)Math.PI/12);
             
             KeyPreview = true;
             Width = ScreenWidth + PointPanelWidth + 50 + 19;
@@ -131,10 +132,12 @@ namespace GraphFunc
                         ProjectionPerspective.Projector.Rotate(Axis.Y, (float)Math.PI/100);
                         break;
                     case Keys.Up:
-                        ProjectionPerspective.Projector.Rotate(Axis.X, -(float)Math.PI/100);
+                        _model.RotateCenter(Axis.X, (float) Math.PI / 12);
+                        //ProjectionPerspective.Projector.Rotate(Axis.X, -(float)Math.PI/100);
                         break;
                     case Keys.Down:
-                        ProjectionPerspective.Projector.Rotate(Axis.X, (float)Math.PI/100);
+                        _model.RotateCenter(Axis.X, -(float) Math.PI / 12);
+                        //ProjectionPerspective.Projector.Rotate(Axis.X, (float)Math.PI/100);
                         break;
                     case Keys.PageUp:
                         _model.RotateCenter(Axis.Z, (float) Math.PI / 12);
