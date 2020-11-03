@@ -241,7 +241,7 @@ namespace GraphFunc.Geometry
                 return result;
         }
 
-        public List<Point3> GetMagnitudes()
+        /*public List<Point3> GetMagnitudes()
         {
             var magnitudes = new List<Point3>();
             for (int i = 0; i < Polygons.Count; i++)
@@ -250,7 +250,7 @@ namespace GraphFunc.Geometry
                 magnitudes.Add(mag);
             }
             return magnitudes;
-        }
+        }*/
 
         public Point3 Vector(Point3 v_start, Point3 v_fin)
         {
