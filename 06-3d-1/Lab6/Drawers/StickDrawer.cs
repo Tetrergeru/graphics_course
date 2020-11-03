@@ -11,11 +11,13 @@ namespace GraphFunc.Drawers
         {
             foreach (var model in models)
             foreach (var polygon in model.Polygons)
+            {
                 polygon
                     .Project(projection, model.Points)
-                    .Scale(new PointF(0, 0), (20, 20))
+                    //.Scale(new PointF(0, 0), (20, 20))
                     .Move(new PointF(screenSize.X / 2f, screenSize.Y / 2f))
                     .Draw(drawer, polygon.Color);
+            }
         }
     }
 }

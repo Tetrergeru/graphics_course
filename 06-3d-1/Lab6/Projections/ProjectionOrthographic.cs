@@ -25,6 +25,9 @@ namespace GraphFunc.Projections
         public PointF? Project(Point3 point)
             => _projector.Project(point);
 
+        public Point3? Project3(Point3 point)
+            => _projector.Project3(point);
+        
         public Matrix3d GetMatrix()
             => _projector.Matrix;
     }

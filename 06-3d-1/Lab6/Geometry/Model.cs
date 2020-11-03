@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using GraphFunc.Projections;
 
 namespace GraphFunc.Geometry
 {
@@ -29,7 +31,6 @@ namespace GraphFunc.Geometry
                 sum.X /= Points.Count;
                 sum.Y /= Points.Count;
                 sum.Z /= Points.Count;
-                Console.WriteLine(sum);
                 return sum;
             }
         }
@@ -57,15 +58,15 @@ namespace GraphFunc.Geometry
 
         private void Apply(Matrix3d matrix)
         {
-            foreach (var point in Points)
-                point.Apply(matrix);
+            for(var i = 0; i< Points.Count; i++)
+                Points[i] = matrix.Multiply(Points[i]);
         }
 
-        private Model Applied(Matrix3d matrix)
+        public Model Applied(IProjection projection)
         {
             var model = new Model
             {
-                Points = Points.Select(matrix.Multiply).ToList(),
+                Points = Points.Select(projection.Project3).Select(p => p ?? new Point3(0, 0, 0)).ToList(),
                 Polygons = Polygons
             };
             return model;
@@ -130,7 +131,7 @@ namespace GraphFunc.Geometry
 
         private static Polygon ParsePolygon(string[] line, List<Point3> points)
         {
-            var polygon = new Polygon(Color.Black);
+            var polygon = new Polygon(Color.Red);
             foreach (var str in line.Skip(1))
             {
                 var pointIdx = int.Parse(str.Substring(0, str.IndexOf('/')));

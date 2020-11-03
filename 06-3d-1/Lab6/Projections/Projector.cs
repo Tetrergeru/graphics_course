@@ -62,6 +62,29 @@ namespace GraphFunc.Projections
         public void Rotate(Axis axis, float angle)
             => Transform = Transform.Moved(axis, angle);
 
+        public Point3? Project3(Point3 point)
+        {
+            var point3 = _matrix.Multiply(point);
+            if (point.Distance(_transform) < 1 || point3.Z < -_screenDistance)
+                return null;
+
+            if (float.IsInfinity(ScreenDistance))
+                return point;
+
+            var result = new Point3(
+                point3.X * ScreenDistance / (point3.Z + ScreenDistance),
+                point3.Y * ScreenDistance / (point3.Z + ScreenDistance),
+                point.Z);
+
+            if (float.IsNaN(result.X) ||
+                float.IsNaN(result.X) ||
+                float.IsInfinity(result.X) ||
+                float.IsInfinity(result.Y))
+                return point;
+
+            return result;
+        }
+
         public PointF? Project(Point3 point)
         {
             var point3 = _matrix.Multiply(point);

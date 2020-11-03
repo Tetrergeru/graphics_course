@@ -23,11 +23,11 @@ namespace GraphFunc
 
         private readonly List<string> _models = new List<string>
         {
-            "Models/Cube.obj",
+            //"Models/Cube.obj",
             //"Models/Square.obj",
-            //"Models/Tetrahedron.obj",
+            "Models/Tetrahedron.obj",
             //"Models/Hexahedron.obj",
-            //"Models/Octahedron.obj",
+            "Models/Octahedron.obj",
             //"Models/Dodecahedron.obj",
             //"Models/Icosahedron.obj",
             //"Models/Skull.obj",
@@ -42,7 +42,7 @@ namespace GraphFunc
         private readonly List<IProjection> _projection = new List<IProjection>
         {
             new ProjectionPerspective(),
-            //new ProjectionIsometric(),
+            new ProjectionIsometric(),
             //new ProjectionOrthographic(Axis.Z),
             //new ProjectionOrthographic(Axis.Y),
             //new ProjectionOrthographic(Axis.X),
@@ -50,13 +50,14 @@ namespace GraphFunc
 
         private int _currentProjection;
         
-        private IDrawer _drawer = new StickDrawer();
+        private IDrawer _drawer = new ZBufferDrawer();
 
         private (Point3 from, Point3 to) RotationLine = (new Point3(0, 0, 0), new Point3(0, 0, 75));
 
         public Form()
         {
             _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
+            _model.ScaleCenter(100);
             
             KeyPreview = true;
             Width = ScreenWidth + PointPanelWidth + 50 + 19;
@@ -79,6 +80,7 @@ namespace GraphFunc
                 Top = 25,
                 Height = ScreenHeight,
                 Width = ScreenWidth,
+                SizeMode = PictureBoxSizeMode.Zoom,
             };
             _screen.Image = new Bitmap(_screen.Width, _screen.Height);
             _screen.MouseUp += (sender, args) =>
@@ -203,6 +205,7 @@ namespace GraphFunc
 
         private void DrawAll()
         {
+            
             var coordinates = new Model();
             coordinates.Points = new List<Point3>
             {
@@ -236,7 +239,7 @@ namespace GraphFunc
             };
             DrawModels(new[]
             {
-                coordinates,
+                //coordinates,
                 _model,
             });
         }
@@ -245,7 +248,8 @@ namespace GraphFunc
         {
             var image = new Bitmap(_screen.Width, _screen.Height);
             var drawer = Graphics.FromImage(image);
-            _drawer.Draw(drawer, new Point(_screen.Width, _screen.Height), models, _projection[_currentProjection]);
+            _drawer.Draw(drawer, new Point(image.Width, image.Height), models, _projection[_currentProjection]);
+            new StickDrawer().Draw(drawer, new Point(image.Width, image.Height), models, _projection[_currentProjection]);
             _screen.Image = image;
         }
     }
