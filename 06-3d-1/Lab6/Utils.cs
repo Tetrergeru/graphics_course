@@ -6,7 +6,7 @@ namespace GraphFunc
 {
     public static class Utils
     {
-        private static Func<float, float, float> GetFunc(string func)
+        public static Func<float, float, float> GetFunc(string func)
         {
             var list = func.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
             return (x, y) =>

@@ -24,8 +24,8 @@ namespace GraphFunc
 
         private readonly List<string> _models = new List<string>
         {
-            "Models/Cube.obj",
-            //"Models/Square.obj",
+            //"Models/Cube.obj",
+            "Models/Square.obj",
             //"Models/Tetrahedron.obj",
             //"Models/Hexahedron.obj",
             //"Models/Octahedron.obj",
@@ -43,8 +43,8 @@ namespace GraphFunc
         private readonly List<IProjection> _projection = new List<IProjection>
         {
             new ProjectionPerspective(),
-            //new ProjectionIsometric(),
-            //new ProjectionOrthographic(Axis.Z),
+            new ProjectionIsometric(),
+           //new ProjectionOrthographic(Axis.Z),
             //new ProjectionOrthographic(Axis.Y),
             //new ProjectionOrthographic(Axis.X),
         };
@@ -265,7 +265,7 @@ namespace GraphFunc
             return textBox;
         }
 
-        private static Panel graphicPanel()
+        private Panel graphicPanel()
         {
             var panel = new Panel
             {
@@ -288,10 +288,34 @@ namespace GraphFunc
             panel.Controls.Add(y1FieldGraphic);
             panel.Controls.Add(stepFieldGraphic);
             panel.Controls.Add(funcFieldGraphic);
+
+            var createButton = new Button
+            {
+                Left = panel.Width - 120,
+                Top = panel.Height - 500,
+                Text = "Draw",
+                Width = 120,
+                Height = 25,
+
+            };
+
+            createButton.Click += (sender, args) =>
+            {
+                double x0, x1, y0, y1, step;
+                Double.TryParse(x0FieldGraphic.Text, out x0);
+                Double.TryParse(x1FieldGraphic.Text, out x1);
+                Double.TryParse(y0FieldGraphic.Text, out y0);
+                Double.TryParse(y1FieldGraphic.Text, out y1);
+                Double.TryParse(stepFieldGraphic.Text, out step);
+
+               _model = Model.MakeGraphic(GraphFunc.Utils.GetFunc(funcFieldGraphic.Text), (float)x0, (float)y0, (float)x1, (float)y1, (float)step);
+            };
+
+            panel.Controls.Add(createButton);
             return panel;
         }
 
-        static private Panel rotatePanel()
+        private Panel rotatePanel()
         {
             var panel = new Panel
             {
@@ -339,10 +363,11 @@ namespace GraphFunc
 
             panel.Controls.Add(axisSpin);
 
+
             return panel;
         }
 
-        static private Panel solidOfRevolutionPanel()
+        private Panel solidOfRevolutionPanel()
         {
             var panel = new Panel
             {
@@ -379,6 +404,37 @@ namespace GraphFunc
             };
 
             panel.Controls.Add(axisSpin);
+
+            var createButton = new Button
+            {
+                Left = panel.Width - 120,
+                Top = panel.Height - 500,
+                Text = "Draw",
+                Width = 120,
+                Height = 25,
+
+            };
+
+            createButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("points - " + _model.Points.Count + " poly - " + _model.Polygons.Count);
+                if (_model.Polygons.Count == 1)
+                {
+                    Axis ax;
+
+                    if (axisSpin.CheckedItems[0].ToString() == "X")
+                        ax = Axis.X;
+                    else if (axisSpin.CheckedItems[0].ToString() == "Y")
+                        ax = Axis.Y;
+                    else
+                        ax = Axis.Z;
+                    Console.WriteLine(axisSpin.CheckedItems[0].ToString());
+                    _model = _model.MakeSpinObj(_model, ax,
+                        int.Parse(segmentsSpin.Text, 0));
+                }
+            };
+
+            panel.Controls.Add(createButton);
 
             return panel;
         }
@@ -419,7 +475,7 @@ namespace GraphFunc
                 {
                     _toolButtons[_currentTool].BackColor = Color.White;
                     _currentTool = j;
-                    Console.WriteLine(_currentTool);
+                   // Console.WriteLine(_currentTool);
                     clearControls(_tools);
                     Controls.Add(_tools[_currentTool].Item1);
                     _toolButtons[_currentTool].BackColor = Color.Aquamarine;
