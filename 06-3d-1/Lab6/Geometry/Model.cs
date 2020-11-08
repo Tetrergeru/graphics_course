@@ -10,7 +10,9 @@ namespace GraphFunc.Geometry
 {
     public class Model
     {
-        public List<Point3> Points;
+        public List<Point3> Points = new List<Point3>();
+
+        public List<Point3> Normals = new List<Point3>();
 
         public string Name = "";
 
@@ -58,8 +60,11 @@ namespace GraphFunc.Geometry
 
         private void Apply(Matrix3d matrix)
         {
-            for(var i = 0; i< Points.Count; i++)
+            for (var i = 0; i < Points.Count; i++)
+            {
                 Points[i] = matrix.Multiply(Points[i]);
+                Normals[i] = matrix.Multiply(Normals[i]);
+            }
         }
 
         public Model Applied(IProjection projection)
@@ -67,6 +72,7 @@ namespace GraphFunc.Geometry
             var model = new Model
             {
                 Points = Points.Select(projection.Project3).Select(p => p ?? new Point3(0, 0, 0)).ToList(),
+                Normals = Normals.Select(projection.Project3).Select(p => p ?? new Point3(0, 0, 0)).ToList(),
                 Polygons = Polygons
             };
             return model;
@@ -100,15 +106,18 @@ namespace GraphFunc.Geometry
         {
             foreach (var point in Points)
                 yield return $"v {point.X} {point.Y} {point.Z}".Replace(',', '.');
+            
+            foreach (var point in Normals)
+                yield return $"vn {point.X} {point.Y} {point.Z}".Replace(',', '.');
 
             foreach (var polygon in Polygons)
-                yield return $"f {string.Join(" ", polygon.Points.Select(p => $"{p + 1}/"))}";
+                yield return
+                    $"f {string.Join(" ", polygon.Points.Zip(polygon.Normals, (p, n) => (p, n)).Select(pn => $"{pn.p + 1}//{pn.n + 1}"))}";
         }
 
         public static Model LoadFromObj(IEnumerable<string> file, string name)
         {
             var model = new Model {Name = name};
-            var points = new List<Point3>();
             foreach (var line in file)
             {
                 if (line.Length == 0)
@@ -116,32 +125,45 @@ namespace GraphFunc.Geometry
                 if (line[0] == '#')
                     continue;
                 var split = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                if (split[0] == "v")
-                    points.Add(ParsePoint(split));
-                else if (split[0] == "f")
-                    model.Polygons.Add(ParsePolygon(split, points));
+                switch (split[0])
+                {
+                    case "v":
+                        model.Points.Add(ParsePoint(split));
+                        break;
+                    case "vn":
+                        model.Normals.Add(ParsePoint(split));
+                        break;
+                    case "f":
+                        model.Polygons.Add(ParsePolygon(split));
+                        break;
+                }
             }
 
-            model.Points = points;
             return model;
         }
 
         private static Point3 ParsePoint(IReadOnlyList<string> line)
             => new Point3(ParseFloat(line[1]), ParseFloat(line[2]), ParseFloat(line[3]));
 
-        private static Polygon ParsePolygon(string[] line, List<Point3> points)
+        private static Polygon ParsePolygon(IEnumerable<string> line)
         {
             var polygon = new Polygon(Color.Red);
             foreach (var str in line.Skip(1))
             {
-                var pointIdx = int.Parse(str.Substring(0, str.IndexOf('/')));
-                if (pointIdx < 0)
-                    pointIdx = -pointIdx;
-                pointIdx -= 1;
-                polygon.Points.Add(pointIdx);
+                var split = str.Split('/');
+                polygon.Points.Add(ToObjFormat(int.Parse(split[0])));
+                polygon.Normals.Add(ToObjFormat(int.Parse(split[2])));
             }
 
             return polygon;
+        }
+
+        private static int ToObjFormat(int idx)
+        {
+            if (idx < 0)
+                idx = -idx;
+            idx -= 1;
+            return idx;
         }
 
         public bool IsNewPolygon(List<Point3> used_points, Polygon p)

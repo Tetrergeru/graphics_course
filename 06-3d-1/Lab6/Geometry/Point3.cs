@@ -41,7 +41,7 @@ namespace GraphFunc.Geometry
                 Axis.Z => new Point3(X, Y, Z + distance, W),
             };
 
-        public float Distance(Point3 other)
+        public readonly float Distance(Point3 other)
         {
             return (float)Math.Sqrt(Math.Pow(other.X - this.X, 2) + Math.Pow(other.Y - this.Y, 2) + Math.Pow(other.Z- this.Z, 2));
         }
@@ -63,5 +63,17 @@ namespace GraphFunc.Geometry
 
         public static bool operator !=(Point3 self, Point3 other) 
             => !(self == other);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Point3 operator +(Point3 self, Point3 other) 
+            => new Point3(self.X + other.X, self.Y + other.Y, self.Z + other.Z);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Point3 operator -(Point3 self, Point3 other) 
+            => new Point3(self.X - other.X, self.Y - other.Y, self.Z - other.Z);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Point3 operator *(Point3 self, float b) 
+            => new Point3(self.X * b, self.Y * b, self.Z * b);
     }
 }

@@ -13,7 +13,12 @@ namespace GraphFunc.Geometry
         public Color Color;
         
         public readonly List<int> Points = new List<int>();
+        
+        public readonly List<int> Normals = new List<int>();
+        
         public Point3 GetPoint(int i, IList<Point3> pointList) => pointList[Points[i]];
+
+        public Point3 GetNormal(int i, IList<Point3> normalList) => normalList[Normals[i]];
         
         public Polygon(Color c)
         {

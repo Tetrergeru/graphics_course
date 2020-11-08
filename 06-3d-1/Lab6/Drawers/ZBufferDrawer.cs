@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using GraphFunc.Geometry;
 using GraphFunc.Projections;
 
@@ -10,11 +10,8 @@ namespace GraphFunc.Drawers
 {
     public class ZBufferDrawer : IDrawer
     {
-        private List<string> file = new List<string>();
-        
         public void Draw(Graphics drawer, Point screenSize, IEnumerable<Model> models, IProjection projection)
         {
-            file = new List<string>();
             var image = new Bitmap(screenSize.X, screenSize.Y);
             var matrix = new float[screenSize.X * screenSize.Y];
             for (var i = 0; i < screenSize.X * screenSize.Y; i++)
@@ -24,140 +21,151 @@ namespace GraphFunc.Drawers
                 var projected = model.Applied(projection);
                 for (var i = 0; i < model.Polygons.Count; i++)
                 {
-                    var polygon = model.Polygons[i];
-                    var (a, b, c) = (
-                        polygon.GetPoint(0, model.Points),
-                        polygon.GetPoint(1, model.Points),
-                        polygon.GetPoint(2, model.Points));
-                    foreach (var (x, y, z) in Rasterize(a, b, c))
+                    var polygon = projected.Polygons[i];
+                    for (var j = 1; j < projected.Polygons[i].Points.Count - 1; j++)
                     {
-                        var newX = x + screenSize.X / 2;
-                        var newY = y + screenSize.Y / 2;
-                        if (newX <= 0 || newX >= screenSize.X ||
-                            newY <= 0 || newY >= screenSize.Y)
-                            continue;
-
-                        var idx = newX * screenSize.X + newY;
-                        if (matrix[idx] > z)
-                            matrix[idx] = z;
+                        var (a, b, c) = (
+                            polygon.GetPoint(0, projected.Points),
+                            polygon.GetPoint(j, projected.Points),
+                            polygon.GetPoint(j + 1, projected.Points));
+                        var (aData, bData, cData) = (
+                            new Data(a.Z, polygon.GetNormal(0, projected.Normals)),
+                            new Data(b.Z, polygon.GetNormal(j, projected.Normals)),
+                            new Data(c.Z, polygon.GetNormal(j + 1, projected.Normals))
+                        );
+                        foreach (var (oldX, oldY, data) in Rasterize(a, b, c, aData, bData, cData))
+                        {
+                            var x = oldX + screenSize.X / 2;
+                            var y = oldY + screenSize.Y / 2;
+                            if (x <= 0 || x >= screenSize.X ||
+                                y <= 0 || y >= screenSize.Y)
+                                continue;
+                            var z = data.Z;
+                            var idx = x * screenSize.X + y;
+                            if (matrix[idx] > z)
+                            {
+                                matrix[idx] = z;
+                                var shade = Math.Acos(data.Normal.Z / data.Normal.Distance(new Point3(0, 0, 0))) * (255/ Math.PI);
+                                image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
+                            }
+                        }
                     }
-
-                    break;
                 }
             }
-
-            for (var x = 0; x < screenSize.X; x++)
-            for (var y = 0; y < screenSize.Y; y++)
-            {
-                var idx = x * screenSize.X + y;
-
-                var z = matrix[idx];
-                if (float.IsPositiveInfinity(z))
-                    continue;
-                if (z < 0)
-                    z = 0;
-                if (z > 255)
-                    z = 255;
-                image.SetPixel(x, y, Color.FromArgb((int) z, (int) z, (int) z));
-            }
-
             drawer.DrawImage(image, 0, 0, screenSize.X, screenSize.Y);
-            File.WriteAllLines("test.csv", file);
         }
 
-        private IEnumerable<(int, int, float)> Rasterize(Point3 a, Point3 b, Point3 c)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IEnumerable<(int, int, Data)> Rasterize(Point3 a, Point3 b, Point3 c,  Data aData, Data bData, Data cData)
         {
             if (Math.Abs(a.Y - b.Y) < 0.000001 && Math.Abs(b.Y - c.Y) < 0.000001)
-                yield break;
+                return new(int, int, Data)[]{};
+            
             if (a.Y < b.Y)
-                (a, b) = (b, a);
+                (a, b, aData, bData) = (b, a, bData, aData);
             if (a.Y < c.Y)
-                (a, c) = (c, a);
+                (a, c, aData, cData) = (c, a, cData, aData);
             if (b.Y < c.Y)
-                (b, c) = (c, b);
+                (b, c, bData, cData) = (c, b, cData, bData);
 
             var diff = (a.Y - b.Y) / (a.Y - c.Y);
-            var m = new Point3(
-                a.X - (a.X - c.X) * diff,
-                b.Y,
-                a.Z - (a.Z - c.Z) * diff);
-            var (ml, mr) = b.X < c.X
-                ? (b, m)
-                : (m, b);
-            Console.WriteLine($"diff: {diff}");
-            //Console.WriteLine($"a: {a}, b: {b}, c: {c}");
-            foreach (var p in TopTriangle(a, ml, mr))
-                yield return p;
-            foreach (var p in BottomTriangle(ml, mr, c))
-                yield return p;
-            Console.WriteLine($"m: {m}");
+            var m = new Point3(a.X - (a.X - c.X) * diff, b.Y, a.Z - (a.Z - c.Z) * diff);
+            var mData = aData - (aData - cData) * diff;
+            var (ml, mr, mlData, mrData) = b.X < m.X
+                ? (b, m, bData, mData)
+                : (m, b, mData, bData);
+
+            return TopTriangle(a, ml, mr, aData, mlData, mrData)
+                .Concat(BottomTriangle(ml, mr, c, mlData, mrData, cData));
         }
 
-        private IEnumerable<(int, int, float)> TopTriangle(Point3 t, Point3 bl, Point3 br)
-        {
-            Console.WriteLine($"a: {t}, b: {bl}, c: {br}");
-            t.Y = (float) Math.Floor(t.Y);
-            bl.Y = (float) Math.Ceiling(bl.Y);
-            var height = (float) Math.Ceiling (t.Y - bl.Y);
-            var leftStep = (bl.X - t.X) / height;
-            var rightStep = (br.X - t.X) / height;
-            
-            var leftZStep = (-t.Z + bl.Z) / height;
-            var rightZStep = (-t.Z + br.Z) / height;
-            var leftZ = t.Z;
-            var rightZ = t.Z;
-            for (var i = 0; i < height; i++)
-            {
-                file.Add("");
-                var currentY = Interpolate(t.Y, bl.Y, i, (int)height);
-                var jStart = (int) Math.Floor(t.X + i * leftStep);
-                var jFinish = (int) Math.Ceiling(t.X + i * rightStep);
-                for (var j = jStart; j < jFinish; j++)
-                {
-                    var horizontalZStep = rightZ - leftZ;
-                    var horizontalOffset = ((float)j - jStart) / (jFinish - jStart);
-                    var z = leftZ - horizontalOffset * horizontalZStep;
-                    file[file.Count - 1] = file[file.Count -1 ] + $" {z}";
-                    yield return (j, (int) t.Y - i, z);
-                }
-                leftZ += leftZStep;
-                rightZ += rightZStep;
-                Console.WriteLine($"leftZ: {leftZ}, rightZ: {rightZ}");
-            }
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IEnumerable<(int, int, Data)> TopTriangle(Point3 t, Point3 bl, Point3 br, Data tData, Data blData, Data brData)
+            => Trapezoid(t, t, bl, br, tData, tData, blData, brData);
 
-        private IEnumerable<(int, int, float)> BottomTriangle(Point3 tl, Point3 tr, Point3 b)
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IEnumerable<(int, int, Data)> BottomTriangle(Point3 tl, Point3 tr, Point3 b, Data tlData, Data trData, Data bData)
+            => Trapezoid(tl, tr, b, b, tlData, trData, bData, bData);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IEnumerable<(int, int, Data)> Trapezoid(Point3 tl, Point3 tr, Point3 bl, Point3 br, Data tlData, Data trData, Data blData, Data brData)
         {
             tl.Y = (float) Math.Ceiling(tl.Y);
-            b.Y = (float) Math.Ceiling(b.Y);
-            var height = (float) Math.Ceiling(tl.Y - b.Y);
-            var leftStep = (b.X - tl.X) / height;
-            var rightStep = (b.X - tr.X) / height;
+            bl.Y = (float) Math.Floor(bl.Y);
             
-            var leftZStep = (b.Z - tl.Z) / height;
-            var rightZStep = -(b.Z - tr.Z) / height;
-            var leftZ = tl.Z;
-            var rightZ = tr.Z;
-            for (var i = 0; i < (int) height; i++)
+            tl.X = (float) Math.Floor(tl.X);
+            bl.X = (float) Math.Floor(bl.X);
+            tr.X = (float) Math.Ceiling(tr.X);
+            br.X = (float) Math.Ceiling(br.X);
+
+            var height = (int) (tl.Y - bl.Y);
+
+            var leftDataStep = Step(tlData, blData, height);
+            var rightDataStep = Step(trData, brData, height);
+            var leftData = tlData;
+            var rightData = trData;
+
+            var xLeftStep = Step(tl.X, bl.X, height);
+            var xRightStep = Step(tr.X, br.X, height);
+
+            var xLeft = tl.X;
+            var xRight = tr.X;
+            for (var i = 0; i < height; i++)
             {
-                file.Add("");
-                var jStart = (int) Math.Floor(tl.X + i * leftStep);
-                var jFinish = (int) Math.Ceiling(tr.X + i * rightStep);
-                for (var j = jStart; j < jFinish; j++)
+                var y = (int) tl.Y - i;
+
+                var xStart = (int) Math.Floor(xLeft);
+                var xFinish = (int) Math.Ceiling(xRight);
+
+                var zStep = Step(leftData, rightData, xFinish - xStart);
+                var data = leftData;
+                for (var x = xStart; x <= xFinish; x++)
                 {
-                    var horizontalZStep = rightZ - leftZ;
-                    var horizontalOffset = ((float)j - jStart) / (jFinish - jStart);
-                    var z = leftZ - horizontalOffset * horizontalZStep;
-                    file[file.Count - 1] = file[file.Count -1 ] + $" {z}";
-                    yield return (j, (int) tl.Y - i, z);
+                    yield return (x, y, data);
+                    data += zStep;
                 }
 
-                leftZ += leftZStep;
-                rightZ += rightZStep;
+                leftData += leftDataStep;
+                rightData += rightDataStep;
+
+                xLeft += xLeftStep;
+                xRight += xRightStep;
             }
         }
 
-        private float Interpolate(float begin, float end, int idx, int steps)
-            => begin + idx * (end - begin) / steps;
+        private static float Step(float begin, float end, int steps)
+            => (end - begin) / steps;
+        
+        private static Data Step(Data begin, Data end, int steps)
+            => (end - begin) / steps;
+    }
+
+    struct Data
+    {
+        public float Z;
+        public Point3 Normal;
+
+        public Data(float z, Point3 normal)
+        {
+            Z = z;
+            Normal = normal;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Data operator +(Data a, Data b)
+            => new Data(a.Z + b.Z, a.Normal + b.Normal);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Data operator -(Data a, Data b)
+            => new Data(a.Z - b.Z, a.Normal - b.Normal);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Data operator *(Data a, float b)
+            => new Data(a.Z * b, a.Normal * b);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Data operator /(Data a, float b)
+            => a * (1 / b);
     }
 }

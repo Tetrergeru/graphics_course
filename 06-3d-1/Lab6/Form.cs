@@ -27,7 +27,7 @@ namespace GraphFunc
             //"Models/Square.obj",
             "Models/Tetrahedron.obj",
             //"Models/Hexahedron.obj",
-            "Models/Octahedron.obj",
+            //"Models/Octahedron.obj",
             //"Models/Dodecahedron.obj",
             //"Models/Icosahedron.obj",
             //"Models/Skull.obj",
@@ -41,9 +41,9 @@ namespace GraphFunc
 
         private readonly List<IProjection> _projection = new List<IProjection>
         {
-            //new ProjectionPerspective(),
+            new ProjectionPerspective(),
             //new ProjectionIsometric(),
-            new ProjectionOrthographic(Axis.Z),
+            //new ProjectionOrthographic(Axis.Z),
             //new ProjectionOrthographic(Axis.Y),
             //new ProjectionOrthographic(Axis.X),
         };
@@ -57,8 +57,8 @@ namespace GraphFunc
         public Form()
         {
             _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
-            _model.ScaleCenter(100);
-            _model.RotateCenter(Axis.Z, (float)Math.PI/12);
+            _model.ScaleCenter(10);
+            _model.RotateCenter(Axis.X, (float)Math.PI/2);
             
             KeyPreview = true;
             Width = ScreenWidth + PointPanelWidth + 50 + 19;
@@ -252,7 +252,7 @@ namespace GraphFunc
             var image = new Bitmap(_screen.Width, _screen.Height);
             var drawer = Graphics.FromImage(image);
             _drawer.Draw(drawer, new Point(image.Width, image.Height), models, _projection[_currentProjection]);
-            new StickDrawer().Draw(drawer, new Point(image.Width, image.Height), models, _projection[_currentProjection]);
+            //new StickDrawer().Draw(drawer, new Point(image.Width, image.Height), models, _projection[_currentProjection]);
             _screen.Image = image;
         }
     }
