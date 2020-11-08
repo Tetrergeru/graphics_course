@@ -28,8 +28,12 @@ namespace GraphFunc.Geometry
         public Polygon2 Project(IProjection projection, IList<Point3> pointList)
         {
             var polygon2 = new Polygon2();
-            foreach (var projected in Points.Select(i => projection.Project(pointList[i])).Where(projected => projected != null))
-                polygon2.AddPoint((PointF)projected);
+            foreach (var projected in Points
+                .Select(i => projection.Project3(pointList[i]))
+                .Where(projected => projected.Z > 0)
+                .Select(p3 => new PointF(p3.X, p3.Y))
+            )
+                polygon2.AddPoint(projected);
 
             return polygon2;
         }

@@ -25,12 +25,12 @@ namespace GraphFunc
         {
             //"Models/Cube.obj",
             //"Models/Square.obj",
-            "Models/Tetrahedron.obj",
+            //"Models/Tetrahedron.obj",
             //"Models/Hexahedron.obj",
             //"Models/Octahedron.obj",
             //"Models/Dodecahedron.obj",
             //"Models/Icosahedron.obj",
-            //"Models/Skull.obj",
+            "Models/Skull.obj",
             //"Models/Prism.obj",
             //"Models/Cat.obj",
         };

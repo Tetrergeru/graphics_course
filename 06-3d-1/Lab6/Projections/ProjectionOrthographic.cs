@@ -22,13 +22,10 @@ namespace GraphFunc.Projections
                 float.PositiveInfinity);
         }
 
-        public PointF? Project(Point3 point)
-            => _projector.Project(point);
-
-        public Point3? Project3(Point3 point)
+        public Point3 Project3(Point3 point)
             => _projector.Project3(point);
-        
-        public Matrix3d GetMatrix()
-            => _projector.Matrix;
+
+        public Point3 ProjectNormal(Point3 normal)
+            => _projector.ProjectNormal(normal);
     }
 }

@@ -9,6 +9,8 @@ namespace GraphFunc.Projections
     {
         private Matrix3d _matrix;
 
+        private Matrix3d _matrixNormal;
+        
         public Matrix3d Matrix => _matrix;
         
         private Point3 _location;
@@ -62,11 +64,9 @@ namespace GraphFunc.Projections
         public void Rotate(Axis axis, float angle)
             => Transform = Transform.Moved(axis, angle);
 
-        public Point3? Project3(Point3 point)
+        public Point3 Project3(Point3 point)
         {
             var point3 = _matrix.Multiply(point);
-            if (point3.Z < -_screenDistance)
-                return null;
 
             if (float.IsInfinity(ScreenDistance))
                 return new Point3(point3.X, point3.Y, point.Z);
@@ -85,28 +85,27 @@ namespace GraphFunc.Projections
             return result;
         }
 
-        public PointF? Project(Point3 point)
+        public Point3 ProjectNormal(Point3 normal)
         {
-            var point3 = _matrix.Multiply(point);
-            if (point.Distance(_transform) < 1 || point3.Z < -_screenDistance)
-                return null;
+            var point3 = _matrixNormal.Multiply(normal);
 
             if (float.IsInfinity(ScreenDistance))
-                return new PointF(point3.X, point3.Y);
+                return new Point3(point3.X, point3.Y, normal.Z);
 
-            var result = new PointF(
+            var result = new Point3(
                 point3.X * ScreenDistance / (point3.Z + ScreenDistance),
-                point3.Y * ScreenDistance / (point3.Z + ScreenDistance));
+                point3.Y * ScreenDistance / (point3.Z + ScreenDistance),
+                normal.Z);
 
             if (float.IsNaN(result.X) ||
                 float.IsNaN(result.X) ||
                 float.IsInfinity(result.X) ||
                 float.IsInfinity(result.Y))
-                return new PointF(point.X, point.Y);
+                return normal;
 
             return result;
         }
-
+        
         private void MakeMatrix()
         {
             _matrix = Matrix3d
@@ -115,8 +114,18 @@ namespace GraphFunc.Projections
                     .Move(new Point3(0, 0, _screenDistance))
                     .Rotate(Axis.X, Transform.X)
                     .Rotate(Axis.Y, Transform.Y)
-                    .Rotate(Axis.Z, Transform.Z)
+                    //.Rotate(Axis.Z, Transform.Z)
                     .Move(new Point3(0, 0, -_screenDistance))
+                ;
+            _matrixNormal = Matrix3d
+                .One
+                .Move(new Point3(-Location.X, -Location.Y, -Location.Z))
+                .Move(new Point3(0, 0, _screenDistance))
+                .Rotate(Axis.X, -Transform.X)
+                .Rotate(Axis.Y, -Transform.Y)
+                .Rotate(Axis.Z, -Transform.Z)
+                .Move(new Point3(0, 0, -_screenDistance))
+                //.Move(new Point3(Location.X, Location.Y, Location.Z))
                 ;
         }
     }

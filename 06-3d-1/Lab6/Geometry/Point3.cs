@@ -75,5 +75,9 @@ namespace GraphFunc.Geometry
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point3 operator *(Point3 self, float b) 
             => new Point3(self.X * b, self.Y * b, self.Z * b);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float operator *(Point3 self, Point3 other) 
+            => self.X * other.X + self.Y * other.Y + self.Z * other.Z;
     }
 }

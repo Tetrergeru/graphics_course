@@ -21,10 +21,10 @@ namespace GraphFunc.Projections
             return new PointF(point3.X, point3.Y);
         }
 
-        public Point3? Project3(Point3 point)
+        public Point3 Project3(Point3 point)
             => Matrix.Multiply(point);
-        
-        public Matrix3d GetMatrix()
-            => Matrix;
+
+        public Point3 ProjectNormal(Point3 normal)
+            => Matrix.Multiply(normal);
     }
 }

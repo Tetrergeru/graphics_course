@@ -10,18 +10,39 @@ namespace GraphFunc.Drawers
 {
     public class ZBufferDrawer : IDrawer
     {
+        private const float Ka = 0.3f;
+
+        private const float Ia = 0.1f;
+        
+        private const float Ks = 0.3f;
+        
+        private const float Kd = 0.4f;
+        
         public void Draw(Graphics drawer, Point screenSize, IEnumerable<Model> models, IProjection projection)
         {
             var image = new Bitmap(screenSize.X, screenSize.Y);
             var matrix = new float[screenSize.X * screenSize.Y];
+            var shades = new float[screenSize.X * screenSize.Y];
             for (var i = 0; i < screenSize.X * screenSize.Y; i++)
+            {
                 matrix[i] = float.PositiveInfinity;
+                shades[i] = float.PositiveInfinity;
+            }
+
             foreach (var model in models)
             {
                 var projected = model.Applied(projection);
                 for (var i = 0; i < model.Polygons.Count; i++)
                 {
                     var polygon = projected.Polygons[i];
+
+                    var firstNormal = polygon.GetNormal(1, projected.Normals);
+                    if (firstNormal.Z < 0)
+                    {
+                        //Console.WriteLine($"{i}");
+                        //continue;
+                    }
+
                     for (var j = 1; j < projected.Polygons[i].Points.Count - 1; j++)
                     {
                         var (a, b, c) = (
@@ -45,12 +66,41 @@ namespace GraphFunc.Drawers
                             if (matrix[idx] > z)
                             {
                                 matrix[idx] = z;
-                                var shade = Math.Acos(data.Normal.Z / data.Normal.Distance(new Point3(0, 0, 0))) * (255/ Math.PI);
-                                image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
+                                var shade = data.Normal * new Point3(0, 0, 1);//(data.Normal.Z / data.Normal.Distance(new Point3(0, 0, 0)));//Math.Acos
+                                shades[idx] = (float)shade;
+                                //image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
                             }
                         }
                     }
                 }
+            }
+
+            var maxShade = float.MinValue;
+            var minShade = float.MaxValue;
+            for (var x = 0; x < screenSize.X; x++)
+            for (var y = 0; y < screenSize.Y; y++)
+            {
+                var idx = x * screenSize.X + y;
+                if (float.IsPositiveInfinity(shades[idx]))
+                    continue;
+                if (shades[idx] > maxShade)
+                    maxShade = shades[idx];
+                if (shades[idx] < minShade)
+                    minShade = shades[idx];
+            }
+
+            for (var x = 0; x < screenSize.X; x++)
+            for (var y = 0; y < screenSize.Y; y++)
+            {
+                var idx = x * screenSize.X + y;
+
+                var shade = shades[idx];
+                if (float.IsPositiveInfinity(shade))
+                    continue;
+                shade -= minShade;
+                shade /= maxShade - minShade;
+                shade *= 255;
+                image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
             }
             drawer.DrawImage(image, 0, 0, screenSize.X, screenSize.Y);
         }

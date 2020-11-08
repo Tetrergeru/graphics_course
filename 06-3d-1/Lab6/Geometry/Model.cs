@@ -38,41 +38,46 @@ namespace GraphFunc.Geometry
         }
 
         public void Scale(float m)
-            => Apply(Matrix3d.ScaleMatrix(m));
+            => ApplyPoints(Matrix3d.ScaleMatrix(m));
 
         public void ScaleCenter(float m)
-            => Apply(Matrix3d.ScalePointMatrix(Center, m));
+            => ApplyPoints(Matrix3d.ScalePointMatrix(Center, m));
 
         public void Move(Point3 delta)
-            => Apply(Matrix3d.MoveMatrix(delta));
+            => ApplyPoints(Matrix3d.MoveMatrix(delta));
 
         public void Rotate(Axis axis, float angle)
-            => Apply(Matrix3d.RotationMatrix(axis, angle));
+            => ApplyPoints(Matrix3d.RotationMatrix(axis, angle));
 
         public void RotateCenter(Axis axis, float angle)
-            => Apply(Matrix3d.RotationCenterMatrix(Center, axis, angle));
+        {
+            ApplyPoints(Matrix3d.RotationCenterMatrix(Center, axis, angle));
+            ApplyNormals(Matrix3d.RotationCenterMatrix(Center, axis, -angle));
+        }
 
         public void RotateLine(Point3 p1, Point3 p2, double angle)
-            => Apply(Matrix3d.LineRotationMatrix(p1, p2, angle));
+            => ApplyPoints(Matrix3d.LineRotationMatrix(p1, p2, angle));
 
         public void Reflect(Axis axis)
-            => Apply(Matrix3d.ReflectionMatrix(axis));
+            => ApplyPoints(Matrix3d.ReflectionMatrix(axis));
 
-        private void Apply(Matrix3d matrix)
+        private void ApplyPoints(Matrix3d matrix)
         {
             for (var i = 0; i < Points.Count; i++)
-            {
                 Points[i] = matrix.Multiply(Points[i]);
+        }
+        private void ApplyNormals(Matrix3d matrix)
+        {
+            for (var i = 0; i < Normals.Count; i++)
                 Normals[i] = matrix.Multiply(Normals[i]);
-            }
         }
 
         public Model Applied(IProjection projection)
         {
             var model = new Model
             {
-                Points = Points.Select(projection.Project3).Select(p => p ?? new Point3(0, 0, 0)).ToList(),
-                Normals = Normals.Select(projection.Project3).Select(p => p ?? new Point3(0, 0, 0)).ToList(),
+                Points = Points.Select(projection.Project3).ToList(),
+                Normals = Normals.Select(projection.ProjectNormal).ToList(),
                 Polygons = Polygons
             };
             return model;
