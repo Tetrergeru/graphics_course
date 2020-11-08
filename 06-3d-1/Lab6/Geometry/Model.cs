@@ -52,7 +52,7 @@ namespace GraphFunc.Geometry
         public void RotateCenter(Axis axis, float angle)
         {
             ApplyPoints(Matrix3d.RotationCenterMatrix(Center, axis, angle));
-            ApplyNormals(Matrix3d.RotationCenterMatrix(Center, axis, -angle));
+            ApplyNormals(Matrix3d.RotationCenterMatrix(new Point3(0, 0, 0), axis, angle));
         }
 
         public void RotateLine(Point3 p1, Point3 p2, double angle)
@@ -66,6 +66,7 @@ namespace GraphFunc.Geometry
             for (var i = 0; i < Points.Count; i++)
                 Points[i] = matrix.Multiply(Points[i]);
         }
+        
         private void ApplyNormals(Matrix3d matrix)
         {
             for (var i = 0; i < Normals.Count; i++)

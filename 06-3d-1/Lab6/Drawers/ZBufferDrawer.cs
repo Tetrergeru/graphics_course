@@ -32,27 +32,28 @@ namespace GraphFunc.Drawers
             foreach (var model in models)
             {
                 var projected = model.Applied(projection);
+                var currentModel = projected;
                 for (var i = 0; i < model.Polygons.Count; i++)
                 {
-                    var polygon = projected.Polygons[i];
+                    var polygon = currentModel.Polygons[i];
 
-                    var firstNormal = polygon.GetNormal(1, projected.Normals);
-                    if (firstNormal.Z < 0)
+                    var firstNormal = polygon.GetNormal(0, currentModel.Normals);
+                    if (firstNormal.Z > 0)
                     {
-                        //Console.WriteLine($"{i}");
-                        //continue;
+                        //Console.WriteLine($"{i}: {firstNormal}");
+                        continue;
                     }
 
-                    for (var j = 1; j < projected.Polygons[i].Points.Count - 1; j++)
+                    for (var j = 1; j < currentModel.Polygons[i].Points.Count - 1; j++)
                     {
                         var (a, b, c) = (
-                            polygon.GetPoint(0, projected.Points),
-                            polygon.GetPoint(j, projected.Points),
-                            polygon.GetPoint(j + 1, projected.Points));
+                            polygon.GetPoint(0, currentModel.Points),
+                            polygon.GetPoint(j, currentModel.Points),
+                            polygon.GetPoint(j + 1, currentModel.Points));
                         var (aData, bData, cData) = (
-                            new Data(a.Z, polygon.GetNormal(0, projected.Normals)),
-                            new Data(b.Z, polygon.GetNormal(j, projected.Normals)),
-                            new Data(c.Z, polygon.GetNormal(j + 1, projected.Normals))
+                            new Data(a.Z, polygon.GetNormal(0, currentModel.Normals)),
+                            new Data(b.Z, polygon.GetNormal(j, currentModel.Normals)),
+                            new Data(c.Z, polygon.GetNormal(j + 1, currentModel.Normals))
                         );
                         foreach (var (oldX, oldY, data) in Rasterize(a, b, c, aData, bData, cData))
                         {
@@ -66,9 +67,8 @@ namespace GraphFunc.Drawers
                             if (matrix[idx] > z)
                             {
                                 matrix[idx] = z;
-                                var shade = data.Normal * new Point3(0, 0, 1);//(data.Normal.Z / data.Normal.Distance(new Point3(0, 0, 0)));//Math.Acos
+                                var shade = data.Normal * new Point3(0, 0, 1);//data.Z;//
                                 shades[idx] = (float)shade;
-                                //image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
                             }
                         }
                     }
@@ -99,8 +99,12 @@ namespace GraphFunc.Drawers
                     continue;
                 shade -= minShade;
                 shade /= maxShade - minShade;
-                shade *= 255;
-                image.SetPixel(x, y, Color.FromArgb((int) shade, (int) shade, (int) shade));
+                var iShade = (int)(shade * 255);
+                if (iShade <= 0)
+                    iShade = 0;
+                if (iShade >= 255)
+                    iShade = 255;
+                image.SetPixel(x, y, Color.FromArgb((int) iShade, (int) iShade, (int) iShade));
             }
             drawer.DrawImage(image, 0, 0, screenSize.X, screenSize.Y);
         }
