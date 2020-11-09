@@ -20,7 +20,10 @@ namespace GraphFunc.Geometry
             if (_points.Count == 1)
                 DrawPoint(graphics, _points[0].ToPoint(), color);
             else
-                graphics.DrawPolygon(new Pen(color), _points.ToArray());
+            {
+                if (CheckVisibility())
+                    graphics.DrawPolygon(new Pen(color), _points.ToArray());
+            }
         }
         
         private static void DrawPoint(Graphics graphics, Point point, Color color, int radius = 2)
@@ -64,6 +67,20 @@ namespace GraphFunc.Geometry
             for (var i = 0; i < _points.Count; i++)
                 _points[i] = matrix.Multiply(_points[i]).ToPoint();
             return this;
+        }
+
+        public bool CheckVisibility()
+        {
+            if (_points.Count < 3)
+                return true;
+            else
+            {
+                var first = _points[0];
+                var second = _points[1];
+                var third = _points[2];
+                var r = (second.X - first.X) * (third.Y - second.Y) - (third.X - second.X) * (second.Y - first.Y);
+                return r <= 0;
+            }
         }
 
     }

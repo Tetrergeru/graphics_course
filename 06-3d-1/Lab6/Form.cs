@@ -24,14 +24,14 @@ namespace GraphFunc
         {
             "Models/Square.obj",
             "Models/Tetrahedron.obj",
-            "Models/Hexahedron.obj",
+            //"Models/Hexahedron.obj",
             "Models/Octahedron.obj",
             "Models/Dodecahedron.obj",
             "Models/Icosahedron.obj",
-            "Models/Cube.obj",
-            "Models/Skull.obj",
-            "Models/Prism.obj",
-            "Models/Cat.obj",
+            //"Models/Cube.obj",
+            //"Models/Skull.obj",
+            //"Models/Prism.obj",
+            //"Models/Cat.obj",
         };
         
         private int _currentModel;
@@ -42,9 +42,9 @@ namespace GraphFunc
         {
             new ProjectionPerspective(),
             new ProjectionIsometric(),
-            new ProjectionOrthographic(Axis.Z),
-            new ProjectionOrthographic(Axis.Y),
-            new ProjectionOrthographic(Axis.X),
+            //new ProjectionOrthographic(Axis.Z),
+            //new ProjectionOrthographic(Axis.Y),
+            //new ProjectionOrthographic(Axis.X),
         };
 
         private int _currentProjection;

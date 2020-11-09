@@ -114,16 +114,16 @@ namespace GraphFunc.Geometry
         public void AddTriangles(ref Model res, List<Point3> points, List<int> indexes, int index1, int index2, int count)
         {
             var polygon = new Polygon(Color.Black);
-            polygon.Points.Add(points[index1]);
             polygon.Points.Add(points[index2]);
             polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
-                res.Polygons.Add(polygon);
+            polygon.Points.Add(points[index1]);
+            res.Polygons.Add(polygon);
 
             polygon = new Polygon(Color.Black);
-            polygon.Points.Add(points[index1]);
             polygon.Points.Add(points[indexes[indexes.Count - count - 1]]);
             polygon.Points.Add(points[indexes[indexes.Count - count - 2]]);
-                res.Polygons.Add(polygon);
+            polygon.Points.Add(points[index1]);
+            res.Polygons.Add(polygon);
         }
         public Model MakeSpinObj(Model base_model, string axis, int segments)
         {
@@ -180,16 +180,16 @@ namespace GraphFunc.Geometry
                         index1 = index2;
                     }
                     var poly = new Polygon(Color.Black);
-                    poly.Points.Add(points[index1]);
                     poly.Points.Add(points[first_point_index]);
                     poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count]]);
-                        result.Polygons.Add(poly);
+                    poly.Points.Add(points[index1]);
+                    result.Polygons.Add(poly);
 
                     poly = new Polygon(Color.Black);
+                    poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count]]);
+                    poly.Points.Add(points[indexes[indexes.Count - 2 * foundation.Points.Count + 3]]);
                     poly.Points.Add(points[index1]);
-                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-                    poly.Points.Add(points[indexes[indexes.Count - foundation.Points.Count - 1]]);
-                        result.Polygons.Add(poly);
+                    result.Polygons.Add(poly);
                 }
                 result._points = points;
                 return result;
