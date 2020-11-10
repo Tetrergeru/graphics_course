@@ -16,9 +16,13 @@ namespace GraphFunc.Geometry
         
         public readonly List<int> Normals = new List<int>();
         
+        public readonly List<int> Textures = new List<int>();
+        
         public Point3 GetPoint(int i, IList<Point3> pointList) => pointList[Points[i]];
 
         public Point3 GetNormal(int i, IList<Point3> normalList) => normalList[Normals[i]];
+        
+        public PointF GetTexture(int i, IList<PointF> textureList) => textureList[Textures[i]];
         
         public Polygon(Color c)
         {

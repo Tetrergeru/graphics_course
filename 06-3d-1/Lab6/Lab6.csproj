@@ -51,6 +51,7 @@
     <Compile Include="Drawers\IDrawer.cs" />
     <Compile Include="Drawers\StickDrawer.cs" />
     <Compile Include="Drawers\ZBufferDrawer.cs" />
+    <Compile Include="FastBitmap.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +99,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Models\Octahedron.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Models\Skull.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Models\Skull.obj">

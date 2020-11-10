@@ -14,6 +14,10 @@ namespace GraphFunc.Geometry
 
         public List<Point3> Normals = new List<Point3>();
 
+        public List<PointF> TextureCoords = new List<PointF>();
+        
+        public Bitmap Texture = new Bitmap(100, 100);
+        
         public string Name = "";
 
         public List<Polygon> Polygons = new List<Polygon>();
@@ -82,6 +86,8 @@ namespace GraphFunc.Geometry
             {
                 Points = Points.Select(projection.Project3).ToList(),
                 Normals = Normals.Select(projection.ProjectNormal).ToList(),
+                TextureCoords = TextureCoords,
+                Texture = Texture,
                 Polygons = Polygons
             };
             return model;
@@ -124,9 +130,11 @@ namespace GraphFunc.Geometry
                     $"f {string.Join(" ", polygon.Points.Zip(polygon.Normals, (p, n) => (p, n)).Select(pn => $"{pn.p + 1}//{pn.n + 1}"))}";
         }
 
-        public static Model LoadFromObj(IEnumerable<string> file, string name)
+        public static Model LoadFromObj(IEnumerable<string> file, string name, string texture = "")
         {
             var model = new Model {Name = name};
+            if (texture != "")
+                model.Texture = new Bitmap(texture);
             foreach (var line in file)
             {
                 if (line.Length == 0)
@@ -142,6 +150,9 @@ namespace GraphFunc.Geometry
                     case "vn":
                         model.Normals.Add(ParsePoint(split));
                         break;
+                    case "vt":
+                        model.TextureCoords.Add(ParsePointF(split));
+                        break;
                     case "f":
                         model.Polygons.Add(ParsePolygon(split));
                         break;
@@ -154,6 +165,9 @@ namespace GraphFunc.Geometry
         private static Point3 ParsePoint(IReadOnlyList<string> line)
             => new Point3(ParseFloat(line[1]), ParseFloat(line[2]), ParseFloat(line[3]));
 
+        private static PointF ParsePointF(IReadOnlyList<string> line)
+            => new PointF(ParseFloat(line[1]), ParseFloat(line[2]));
+        
         private static Polygon ParsePolygon(IEnumerable<string> line)
         {
             var polygon = new Polygon(Color.Red);
@@ -161,6 +175,7 @@ namespace GraphFunc.Geometry
             {
                 var split = str.Split('/');
                 polygon.Points.Add(ToObjFormat(int.Parse(split[0])));
+                polygon.Textures.Add(split[1] != "" ? ToObjFormat(int.Parse(split[1])) : 1);
                 polygon.Normals.Add(ToObjFormat(int.Parse(split[2])));
             }
 

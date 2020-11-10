@@ -56,7 +56,7 @@ namespace GraphFunc
 
         public Form()
         {
-            _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel]);
+            _model = Model.LoadFromObj(File.ReadLines(_models[_currentModel]), _models[_currentModel], _models[_currentModel].Replace(".obj", ".jpg"));
             _model.ScaleCenter(10);
             _model.Move(new Point3(0, 0, -10));
             _model.RotateCenter(Axis.X, (float)Math.PI/2);

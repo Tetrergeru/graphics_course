@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using GraphFunc.Geometry;
@@ -10,7 +11,7 @@ namespace GraphFunc.Drawers
 {
     public class ZBufferDrawer : IDrawer
     {
-        public static Point3 Light = new Point3(0, 0, 1);
+        public static Point3 Light = new Point3(0, 0, -1);
         private const float Ka = 0.3f;
 
         private const float Ia = 0.1f;
@@ -24,6 +25,7 @@ namespace GraphFunc.Drawers
             var image = new Bitmap(screenSize.X, screenSize.Y);
             var matrix = new float[screenSize.X * screenSize.Y];
             var shades = new float[screenSize.X * screenSize.Y];
+            var colors = new Color[screenSize.X * screenSize.Y];
             for (var i = 0; i < screenSize.X * screenSize.Y; i++)
             {
                 matrix[i] = float.PositiveInfinity;
@@ -33,40 +35,50 @@ namespace GraphFunc.Drawers
             foreach (var model in models)
             {
                 var projected = model.Applied(projection);
-                var currentModel = projected;
-                for (var i = 0; i < model.Polygons.Count; i++)
+                var (w, h) = (projected.Texture.Width, projected.Texture.Height);
+                using (var texture = new FastBitmap(projected.Texture.Clone(new Rectangle(0, 0, projected.Texture.Width, projected.Texture.Height), PixelFormat.Format32bppArgb)))
                 {
-                    var polygon = currentModel.Polygons[i];
-
-                    for (var j = 1; j < currentModel.Polygons[i].Points.Count - 1; j++)
+                    projected.Polygons.AsParallel().ForAll(polygon =>
                     {
-                        var (a, b, c) = (
-                            polygon.GetPoint(0, currentModel.Points),
-                            polygon.GetPoint(j, currentModel.Points),
-                            polygon.GetPoint(j + 1, currentModel.Points));
-                        var (aData, bData, cData) = (
-                            new Data(a.Z, polygon.GetNormal(0, currentModel.Normals)),
-                            new Data(b.Z, polygon.GetNormal(j, currentModel.Normals)),
-                            new Data(c.Z, polygon.GetNormal(j + 1, currentModel.Normals))
-                        );
-                        foreach (var (oldX, oldY, data) in Rasterize(a, b, c, aData, bData, cData))
+                        for (var j = 1; j < polygon.Points.Count - 1; j++)
                         {
-                            var x = oldX + screenSize.X / 2;
-                            var y = oldY + screenSize.Y / 2;
-                            if (x <= 0 || x >= screenSize.X ||
-                                y <= 0 || y >= screenSize.Y)
-                                continue;
-                            var z = data.Z;
-                            var idx = x * screenSize.X + y;
-                            if (matrix[idx] > z)
+                            var (a, b, c) = (
+                                polygon.GetPoint(0, projected.Points),
+                                polygon.GetPoint(j, projected.Points),
+                                polygon.GetPoint(j + 1, projected.Points));
+                            var (aData, bData, cData) = (
+                                new Data(a.Z, polygon.GetNormal(0, projected.Normals),
+                                    polygon.GetTexture(0, projected.TextureCoords)),
+                                new Data(b.Z, polygon.GetNormal(j, projected.Normals),
+                                    polygon.GetTexture(j, projected.TextureCoords)),
+                                new Data(c.Z, polygon.GetNormal(j + 1, projected.Normals),
+                                    polygon.GetTexture(j + 1, projected.TextureCoords))
+                            );
+                            foreach (var (oldX, oldY, data) in Rasterize(a, b, c, aData, bData, cData))
                             {
+                                var x = oldX + screenSize.X / 2;
+                                var y = oldY + screenSize.Y / 2;
+                                if (x <= 0 || x >= screenSize.X ||
+                                    y <= 0 || y >= screenSize.Y)
+                                    continue;
+                                var z = data.Z;
+                                var idx = x * screenSize.X + y;
+
+                                if (matrix[idx] <= z)
+                                    continue;
+
                                 matrix[idx] = z;
-                                var normal = data.Normal * (1/data.Normal.Length());
-                                var shade = Ka * Ia + Kd * (normal * Light) + Ks * Math.Pow(normal * (normal * (2 * (Light * normal)) - Light), 20);
-                                shades[idx] = (float)shade;
+                                var normal = data.Normal * (1 / data.Normal.Length());
+                                var shade = Ka * Ia + Kd * (normal * Light) +
+                                            Ks * Math.Pow(normal * (normal * (2 * (Light * normal)) - Light), 80);
+                                shades[idx] = (float) shade;
+                                colors[idx] = texture.GetPixel(
+                                    (int) (data.TextureCoordinate.X * w),
+                                    (int) ((1 - data.TextureCoordinate.Y) * h));
+                                //Console.WriteLine(colors[idx]);
                             }
                         }
-                    }
+                    });
                 }
             }
 
@@ -89,19 +101,31 @@ namespace GraphFunc.Drawers
             {
                 var idx = x * screenSize.X + y;
 
-                var shade = shades[idx];
+                var shade = shades[idx] * 1.5f;
                 if (float.IsPositiveInfinity(shade))
                     continue;
                 //shade -= minShade;
                 //shade /= maxShade - minShade;
-                var iShade = (int)(shade * 255);
-                if (iShade <= 0)
-                    iShade = 0;
-                if (iShade >= 255)
-                    iShade = 255;
-                image.SetPixel(x, y, Color.FromArgb((int) iShade, (int) iShade, (int) iShade));
+                var color = colors[idx];
+                var r = Bytize(color.R * shade);
+                var g = Bytize(color.G * shade);
+                var b = Bytize(color.B * shade );// * shade
+                //r = Bytize(shade * 255);
+                //g = r;
+                //b = r;
+                image.SetPixel(x, y, Color.FromArgb(r, g, b));
             }
             drawer.DrawImage(image, 0, 0, screenSize.X, screenSize.Y);
+            Console.WriteLine("1");
+        }
+
+        private static byte Bytize(float number)
+        {
+            if (number <= 0)
+                number = 0;
+            if (number >= 255)
+                number = 255;
+            return (byte)number;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -193,28 +217,40 @@ namespace GraphFunc.Drawers
     struct Data
     {
         public float Z;
+        
         public Point3 Normal;
 
-        public Data(float z, Point3 normal)
+        public PointF TextureCoordinate;
+
+        public Data(float z, Point3 normal, PointF textureCoordinate)
         {
             Z = z;
             Normal = normal;
+            TextureCoordinate = textureCoordinate;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Data operator +(Data a, Data b)
-            => new Data(a.Z + b.Z, a.Normal + b.Normal);
+            => new Data(a.Z + b.Z, a.Normal + b.Normal, AddPointF(a.TextureCoordinate, b.TextureCoordinate));
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Data operator -(Data a, Data b)
-            => new Data(a.Z - b.Z, a.Normal - b.Normal);
+            => new Data(a.Z - b.Z, a.Normal - b.Normal, SubPointF(a.TextureCoordinate, b.TextureCoordinate));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Data operator *(Data a, float b)
-            => new Data(a.Z * b, a.Normal * b);
+            => new Data(a.Z * b, a.Normal * b, new PointF(a.TextureCoordinate.X * b, a.TextureCoordinate.Y * b));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Data operator /(Data a, float b)
             => a * (1 / b);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static PointF AddPointF(PointF a, PointF b)
+            => new PointF(a.X + b.X, a.Y + b.Y);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static PointF SubPointF(PointF a, PointF b)
+            => new PointF(a.X - b.X, a.Y - b.Y);
     }
 }
