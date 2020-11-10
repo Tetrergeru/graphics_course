@@ -9,7 +9,7 @@ namespace GraphFunc.Projections
         public static readonly Projector Projector = new Projector(
             new Point3(0, 0, -100),
             new Point3(0, 0, 0),
-            200);
+            500);
 
         public Point3 Project3(Point3 point)
             => Projector.Project3(point);

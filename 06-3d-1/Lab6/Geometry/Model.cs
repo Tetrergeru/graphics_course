@@ -70,7 +70,10 @@ namespace GraphFunc.Geometry
         private void ApplyNormals(Matrix3d matrix)
         {
             for (var i = 0; i < Normals.Count; i++)
-                Normals[i] = matrix.Multiply(Normals[i]);
+            {
+               var n = matrix.Multiply(Normals[i]);
+               Normals[i] = n * (1 / n.Length());
+            }
         }
 
         public Model Applied(IProjection projection)

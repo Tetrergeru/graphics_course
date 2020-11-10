@@ -10,13 +10,14 @@ namespace GraphFunc.Drawers
 {
     public class ZBufferDrawer : IDrawer
     {
+        public static Point3 Light = new Point3(0, 0, 1);
         private const float Ka = 0.3f;
 
         private const float Ia = 0.1f;
         
         private const float Ks = 0.3f;
         
-        private const float Kd = 0.4f;
+        private const float Kd = 0.3f;
         
         public void Draw(Graphics drawer, Point screenSize, IEnumerable<Model> models, IProjection projection)
         {
@@ -36,13 +37,6 @@ namespace GraphFunc.Drawers
                 for (var i = 0; i < model.Polygons.Count; i++)
                 {
                     var polygon = currentModel.Polygons[i];
-
-                    var firstNormal = polygon.GetNormal(0, currentModel.Normals);
-                    if (firstNormal.Z > 0)
-                    {
-                        //Console.WriteLine($"{i}: {firstNormal}");
-                        continue;
-                    }
 
                     for (var j = 1; j < currentModel.Polygons[i].Points.Count - 1; j++)
                     {
@@ -67,7 +61,8 @@ namespace GraphFunc.Drawers
                             if (matrix[idx] > z)
                             {
                                 matrix[idx] = z;
-                                var shade = data.Normal * new Point3(0, 0, 1);//data.Z;//
+                                var normal = data.Normal * (1/data.Normal.Length());
+                                var shade = Ka * Ia + Kd * (normal * Light) + Ks * Math.Pow(normal * (normal * (2 * (Light * normal)) - Light), 20);
                                 shades[idx] = (float)shade;
                             }
                         }
@@ -97,8 +92,8 @@ namespace GraphFunc.Drawers
                 var shade = shades[idx];
                 if (float.IsPositiveInfinity(shade))
                     continue;
-                shade -= minShade;
-                shade /= maxShade - minShade;
+                //shade -= minShade;
+                //shade /= maxShade - minShade;
                 var iShade = (int)(shade * 255);
                 if (iShade <= 0)
                     iShade = 0;

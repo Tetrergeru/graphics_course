@@ -26,11 +26,11 @@ namespace GraphFunc
             //"Models/Cube.obj",
             //"Models/Square.obj",
             //"Models/Tetrahedron.obj",
-            "Models/Hexahedron.obj",
+            //"Models/Hexahedron.obj",
             //"Models/Octahedron.obj",
             //"Models/Dodecahedron.obj",
             //"Models/Icosahedron.obj",
-            //"Models/Skull.obj",
+            "Models/Skull.obj",
             //"Models/Prism.obj",
             //"Models/Cat.obj",
         };
@@ -141,10 +141,18 @@ namespace GraphFunc
                         ProjectionPerspective.Projector.Rotate(Axis.X, (float)Math.PI/100);
                         break;
                     case Keys.PageUp:
-                        _model.RotateCenter(Axis.Z, (float) Math.PI / 12);
+                        ZBufferDrawer.Light = Matrix3d.RotationMatrix(Axis.Y, (float)Math.PI/12).Multiply(ZBufferDrawer.Light);
+                        //_model.RotateCenter(Axis.Z, (float) Math.PI / 12);
                         break;
                     case Keys.PageDown:
-                        _model.RotateCenter(Axis.Z, -(float) Math.PI / 12);
+                        ZBufferDrawer.Light = Matrix3d.RotationMatrix(Axis.Y, -(float)Math.PI/12).Multiply(ZBufferDrawer.Light);
+                        //_model.RotateCenter(Axis.Z, -(float) Math.PI / 12);
+                        break;
+                    case Keys.Home:
+                        ZBufferDrawer.Light = Matrix3d.RotationMatrix(Axis.X, (float)Math.PI/12).Multiply(ZBufferDrawer.Light);
+                        break;
+                    case Keys.End:
+                        ZBufferDrawer.Light = Matrix3d.RotationMatrix(Axis.X, -(float)Math.PI/12).Multiply(ZBufferDrawer.Light);
                         break;
                     case Keys.F1:
                         _model.Reflect(Axis.X);

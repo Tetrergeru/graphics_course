@@ -78,16 +78,9 @@ namespace GraphFunc.Projections
         public Point3 ProjectNormal(Point3 normal)
         {
             var point3 = _matrix.Multiply(normal) - _matrix.Multiply(new Point3(0,0,0));
-
-            if (float.IsInfinity(ScreenDistance))
-                return new Point3(point3.X, point3.Y, normal.Z);
-
-            var result = new Point3(
-                point3.X * ScreenDistance / (point3.Z + ScreenDistance),
-                point3.Y * ScreenDistance / (point3.Z + ScreenDistance),
-                point3.Z);
-
-            return result;
+            point3 *= 1 / point3.Length();
+            
+            return point3;
         }
         
         private void MakeMatrix()
