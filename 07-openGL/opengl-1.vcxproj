@@ -150,7 +150,7 @@
   <ImportGroup Label="ExtensionTargets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\freeglut.3.0.0.v140.1.0.2\build\freeglut.3.0.0.v140.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\freeglut.3.0.0.v140.1.0.2\build\freeglut.3.0.0.v140.props'))" />
     <Error Condition="!Exists('packages\soil.1.16.0\build\native\soil.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\soil.1.16.0\build\native\soil.props'))" />
