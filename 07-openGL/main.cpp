@@ -87,10 +87,14 @@ void drawFloor()
 	glBindTexture(GL_TEXTURE_2D, texture);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glNormal3f(0, 0, 1); glVertex3f(-10, -10, 0);
-    glTexCoord2f(0, 1); glNormal3f(0, 0, 1); glVertex3f(-10, 10, 0);
-    glTexCoord2f(1, 1); glNormal3f(0, 0, 1); glVertex3f(10, 10, 0);
-    glTexCoord2f(1, 0); glNormal3f(0, 0, 1); glVertex3f(10, -10, 0);
+	const int NUM = 200;
+	for (int i = 0; i < NUM; i++)
+	for (int j = 0; j < NUM; j++) {
+		glTexCoord2f(i * 1.0 / NUM, j * 1.0 / NUM);             glNormal3f(0, 0, 1); glVertex3f(-10 + i * 20.0 / NUM, -10 + j * 20.0 / NUM, 0);
+		glTexCoord2f(i * 1.0 / NUM, (j + 1) * 1.0 / NUM);       glNormal3f(0, 0, 1); glVertex3f(-10 + i * 20.0 / NUM, -10 + (j + 1) * 20.0 / NUM, 0);
+		glTexCoord2f((i + 1) * 1.0 / NUM, (j + 1) * 1.0 / NUM); glNormal3f(0, 0, 1); glVertex3f(-10 + (i + 1) * 20.0 / NUM, -10 + (j + 1) * 20.0 / NUM, 0);
+		glTexCoord2f((i + 1) * 1.0 / NUM, j * 1.0 / NUM);       glNormal3f(0, 0, 1); glVertex3f(-10 + (i + 1) * 20.0 / NUM, -10 + j * 20.0 / NUM, 0);
+	}
     glEnd();
 
 	glDisable(GL_TEXTURE_2D);
@@ -103,11 +107,11 @@ void drawSphere()
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dif);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dif);
+	glMaterialf(GL_FRONT, GL_SHININESS, 128.0);
 
 	glBindTexture(GL_TEXTURE_2D, sphere_texture);
-	glMaterialf(GL_FRONT, GL_SHININESS, 10);
 
 	glMaterialfv(GL_FRONT, GL_SPECULAR, lamp_light);
 	glutSolidSphere(0.3, 8, 8);
