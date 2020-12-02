@@ -274,9 +274,11 @@ void drawCristmasTree()
     double startX = 2.57;
     double startY = 1.12;
 	glTranslated(-0.5, -2.5, 2.2);
-    for (int i = 0; i < 34 - 16; i++)
+	double disc = 0.7;
+	double disc2 = 0.175;
+    for (int i = 1; i < 19; i++)
     {
-        glTranslated(0.7, 0.0, 0);
+        glTranslated(disc, 0.0, 0);
 	    glRotated(360/24, 0, 0, 1);
 	    glRotated(360/80, 1, 0, 0);
 	    glColor3f((rand() % 255) / 255.0, (rand() % 255) / 255.0, (rand() % 255) / 255.0);
@@ -286,6 +288,11 @@ void drawCristmasTree()
 			glMaterialfv(GL_FRONT, GL_EMISSION, no_light);
         glutSolidSphere(0.1, 6, 6);
 	    glColor3f(1.0, 1.0, 1.0);
+		if (i % 6 == 0)
+		{
+			disc -= disc2;
+			disc2 -= 0.33;
+		}
     }
     glPopMatrix();
 }
@@ -386,26 +393,26 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void specialKeys(int key, int x, int y) {
-	/////*switch (key)
-	////{
-	////case GLUT_KEY_RIGHT:
-	////	carAngle -= 10;
-	////	break;
-	////case GLUT_KEY_LEFT:
-	////	carAngle += 10;
-	////	break;
-	////case GLUT_KEY_UP:
-	////	carX += std::cos(carAngle/180 * M_PI) * 0.3;
-	////	carY += std::sin(carAngle/180 * M_PI) * 0.3;
-	////	break;
-	////case GLUT_KEY_DOWN:
-	////	carX -= std::cos(carAngle/180 * M_PI) * 0.3;
-	////	carY -= std::sin(carAngle/180 * M_PI) * 0.3;
-	////	break;
-	////default:
-	////	break;
-	////}
-	////std::cout << carX << "   " << carY << std::endl;*/
+	switch (key)
+	{
+	case GLUT_KEY_RIGHT:
+		carAngle -= 10;
+		break;
+	case GLUT_KEY_LEFT:
+		carAngle += 10;
+		break;
+	case GLUT_KEY_UP:
+		carX += std::cos(carAngle / 180 * M_PI) * 0.3;
+		carY += std::sin(carAngle / 180 * M_PI) * 0.3;
+		break;
+	case GLUT_KEY_DOWN:
+		carX -= std::cos(carAngle / 180 * M_PI) * 0.3;
+		carY -= std::sin(carAngle / 180 * M_PI) * 0.3;
+		break;
+	default:
+		break;
+	}
+	//std::cout << carX << "   " << carY << std::endl;
 }
 
 void reshape(int width, int height) {
