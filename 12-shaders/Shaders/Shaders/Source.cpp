@@ -34,7 +34,7 @@ void initShaderStrips()
 	const char* fsSource =
 		"uniform vec4 color;\n"
 		"void main() {\n"
-		" if (mod(gl_FragCoord.x, 10)<5.0) \n"
+		" if (mod(gl_FragCoord.x, 30)<15.0) \n"
 		" gl_FragColor = color;\n"
 		" else\n"
 		" gl_FragColor = vec4(1.0,1.0,1.0,0.0);\n"
@@ -98,10 +98,10 @@ void initShaderSquares()
 	const char* fsSource =
 		"uniform vec4 color;\n"
 		"void main() {\n"
-		" if (mod(gl_FragCoord.x, 10)<5.0 && mod(gl_FragCoord.y, 10)>5.0) \n"
+		" if ((mod(gl_FragCoord.x, 30)<15.0 && mod(gl_FragCoord.y, 30)>15.0) || (mod(gl_FragCoord.x, 30)>15.0 && mod(gl_FragCoord.y, 30)<15.0)) \n"
 		" gl_FragColor = color;\n"
 		" else\n"
-		" gl_FragColor = vec4(1.0,0.0,1.0,0.0);\n"
+		" gl_FragColor = vec4(1.0,1.0,1.0,0.0);\n"
 		"}\n";
 
 	//! Переменные для хранения идентификаторов шейдеров
@@ -162,9 +162,6 @@ void freeShader()
 //--------------------------------конец Shader--------------------------------
 
 static int w = 0, h = 0;
-double rotate_x = 0;
-double rotate_y = 0;
-double rotate_z = 0;
 float Angle = 0;
 std::vector<std::function<void()>> vFunc;
 int current = 0;
@@ -188,6 +185,7 @@ void RenderRectangle()
 	static float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 	//! Передаем юниформ в шейдер
 	glUniform4fv(Unif_color, 1, red);
+
 	glBegin(GL_QUADS);
 	glVertex3f(-0.5f, -0.5f, 0);
 	glVertex3f(-0.5f, 0.5f, 0);
