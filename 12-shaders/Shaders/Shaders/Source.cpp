@@ -7,7 +7,6 @@
 #include <functional>
 #include <conio.h>
 #include <iostream>
-
 //--------------------------------начало Shader--------------------------------
 //! ID шейдерной программы
 GLuint Program;
@@ -15,6 +14,9 @@ GLuint Program;
 GLint Attrib_vertex;
 //! ID юниформ переменной цвета
 GLint Unif_color;
+
+GLint Unif_angle;
+
 //! Проверка ошибок OpenGL, если есть то вывод в консоль тип ошибки
 void checkOpenGLerror() 
 {
@@ -151,6 +153,112 @@ void initShaderSquares()
 	checkOpenGLerror();
 }
 
+void initShaderTriangle()
+{
+	const char* vsSource =
+		"attribute vec2 coord;\n"
+		"uniform float angle;\n"
+		"varying vec4 var_color; \n"
+		"mat2 rot(in float a) {return mat2(cos(a), sin(a), -sin(a), cos(a));}\n"
+		"void main() {\n"
+		" vec2 pos = rot(3.14*angle)*coord;\n"
+		" gl_Position = vec4(pos, 0, 1.0);\n"
+		" var_color = gl_Color;\n"
+		"}\n";
+
+	const char* fsSource =
+		"varying vec4 var_color;\n"
+		"void main() {\n"
+		" gl_FragColor = var_color;\n"
+		"}\n";
+	GLuint vShader, fShader;
+	vShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vShader, 1, &vsSource, NULL);
+	glCompileShader(vShader);
+	std::cout << "vertex shader \n";
+	fShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fShader, 1, &fsSource, NULL);
+	glCompileShader(fShader);
+	Program = glCreateProgram();
+	glAttachShader(Program, vShader);
+	glAttachShader(Program, fShader);
+
+	glLinkProgram(Program);
+	int link_ok;
+	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
+	if (!link_ok) 
+	{
+		std::cout << "error attach shaders \n"; 
+		return;
+	}
+	const char* attr_name = "coord";
+	Attrib_vertex = glGetAttribLocation(Program, attr_name);
+	if (Attrib_vertex == -1)
+	{
+		std::cout << "could not bind attrib " << attr_name << std::endl;
+		return;
+	}
+	Unif_angle =  glGetUniformLocation(Program, "angle");
+	if (Unif_angle == -1)
+	{
+		std::cout << "could not bind uniform " << "angle" << std::endl;
+	}
+	checkOpenGLerror();
+}
+
+void initShaderCube()
+{
+	const char* vsSource =
+		"attribute vec2 coord;\n"
+		"void main() {\n"
+		"  gl_Position = vec4(coord, 0.0, 1.0);\n"
+		"}\n";
+
+	const char* fsSource =
+		"uniform vec4 color;\n"
+		"void main() {\n"
+		" if (mod(gl_FragCoord.x, 30)<15.0) \n"
+		" gl_FragColor = color;\n"
+		" else\n"
+		" gl_FragColor = vec4(1.0,1.0,1.0,0.0);\n"
+		"}\n";
+	GLuint vShader, fShader;
+	vShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vShader, 1, &vsSource, NULL);
+	glCompileShader(vShader);
+	std::cout << "vertex shader \n";
+	fShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fShader, 1, &fsSource, NULL);
+	glCompileShader(fShader);
+	Program = glCreateProgram();
+	glAttachShader(Program, vShader);
+	glAttachShader(Program, fShader);
+
+	glLinkProgram(Program);
+	int link_ok;
+	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
+	if (!link_ok)
+	{
+		std::cout << "error attach shaders \n";
+		return;
+	}
+	const char* attr_name = "coord";
+	Attrib_vertex = glGetAttribLocation(Program, attr_name);
+	if (Attrib_vertex == -1)
+	{
+		std::cout << "could not bind attrib " << attr_name << std::endl;
+		return;
+	}
+	const char* unif_name = "color";
+	Unif_color = glGetUniformLocation(Program, unif_name);
+	if (Unif_color == -1)
+	{
+		std::cout << "could not bind uniform " << unif_name << std::endl;
+		return;
+	}
+	checkOpenGLerror();
+}
+
 //! Освобождение шейдеров
 void freeShader()
 {
@@ -203,44 +311,37 @@ void RenderRectangle()
 void RenderTriangle()
 {
 	glMatrixMode(GL_MODELVIEW);
-	Angle += 0.05f;
+	Angle += 0.01f;
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
-	gluLookAt(100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	//gluLookAt(100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	glRotatef(Angle, 0.0f, 1.0f, 0.0f);
+	//! Устанавливаем шейдерную программу текущей
+	glUseProgram(Program);
+	//static float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	//! Передаем юниформ в шейдер
+	glUniform1f(Unif_angle, Angle);
+
 	glBegin(GL_TRIANGLES);
-	glColor3ub(0, 0, 255);
-	glVertex3f(0.0, 0.0, 0.0);
-	glColor3ub(255, 0, 0);
-	glVertex3f(75.0, 0.0, 0.0);
-	glColor3ub(0, 255, 0);
-	glVertex3f(75.0, 75.0, 0.0);
+	glColor3f(0, 1, 1);  glVertex2f(-0.5f, -0.5f);
+	glColor3f(1, 0.2, 0);  glVertex2f(-0.5f, 0.5f);
+	glColor3f(1, 0, 1);  glVertex2f(0.5f, 0.5f);
 	glEnd();
 	glutSwapBuffers();
-	glPointSize(10.0f);
 }
 
 void RenderSolidCube()
 {
-	glMatrixMode(GL_MODELVIEW);
-	Angle += 0.05f;
-	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-	gluLookAt(100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	glRotatef(Angle, 0.0f, 1.0f, 0.0f);
-	glutSolidCube(70);
-	glColor3ub(255, 0, 0);
-	glutWireCube(71);
-	glColor3ub(255, 255, 255);
-	glutSwapBuffers();
+	
 
 }
 
 void InitFuncVector()
 {
-	vFunc.push_back(RenderRectangle);
-	vFunc.push_back(RenderSolidCube);
+
+	//vFunc.push_back(RenderRectangle);
 	vFunc.push_back(RenderTriangle);
+	//vFunc.push_back(RenderSolidCube);
 }
 
 void Update(void)
@@ -287,8 +388,10 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	initShaderStrips();
+	//initShaderStrips();
 	//initShaderSquares();
+	initShaderTriangle();
+	//initShaderCube();
 
 	glutIdleFunc(Update);
 	glutDisplayFunc(Update);
