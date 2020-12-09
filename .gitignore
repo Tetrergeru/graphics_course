@@ -5,3 +5,6 @@ obj
 Debug
 packages
 x64
+*.dll
+*.ilk
+*.exe

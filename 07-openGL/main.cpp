@@ -33,7 +33,7 @@ unsigned int texture = 0;
 unsigned int sphere_texture = 0;
 
 void loadTextures() {
-	texture = SOIL_load_OGL_texture("2.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
+	texture = SOIL_load_OGL_texture("1.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
