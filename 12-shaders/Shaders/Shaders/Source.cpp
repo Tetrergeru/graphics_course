@@ -308,9 +308,9 @@ void initShaderCube2()
 		"mat3 rot(in float a) {return mat3(1.0, 0.0, 0.0, 0.0, cos(a), -sin(a), 0.0, sin(a), cos(a)) *\n"
 		"                             mat3(cos(a), 0.0, sin(a), 0.0, 1.0, 0.0, -sin(a), 0.0, cos(a))  ;}\n"
 		"void main() {\n"
-		" vec3 pos = rot(3.14*1.3)*coord;\n"
+		" vec3 pos = rot(3.14*angle)*coord;\n"
 		" gl_Position = vec4(pos, 1.0);\n"
-		" gl_FrontColor = vec4(pos + vec3(0.5, 0.5, 0.5), 1.0);\n"
+		" gl_FrontColor = gl_Color;//vec4(pos + vec3(0.5, 0.5, 0.5), 1.0);\n"
 		"}\n";
 
 	const char* fsSource =
@@ -484,11 +484,7 @@ void RenderTriangle()
 	glutSwapBuffers();
 }
 
-
-
-
-void RenderSolidCube()
-{
+void RenderSolidCube() {
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -525,11 +521,61 @@ void RenderSolidCube()
 	glutSwapBuffers();
 }
 
+void RenderSolidCube2() {
+	glMatrixMode(GL_MODELVIEW);
+	Angle += 0.01f;
+	glClear(GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();
+	//gluLookAt(100.0f, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	glRotatef(Angle, 0.0f, 1.0f, 0.0f);
+	//! Устанавливаем шейдерную программу текущей
+	glUseProgram(Program);
+	//static float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	//! Передаем юниформ в шейдер
+	glUniform1f(Unif_angle, Angle);
+
+	glBegin(GL_QUADS); {
+		glColor3f(0, 1, 1);  glVertex3f(-0.5f, -0.5f, -0.5f);
+		glColor3f(1, 1, 0);  glVertex3f(-0.5f, 0.5f, -0.5f);
+		glColor3f(1, 0, 1);  glVertex3f(-0.5f, 0.5f, 0.5f);
+		glColor3f(1, 1, 1);  glVertex3f(-0.5f, -0.5f, 0.5f);
+
+		glColor3f(1, 0, 0);  glVertex3f(0.5f, -0.5f, -0.5f);
+		glColor3f(0, 1, 0);  glVertex3f(0.5f, 0.5f, -0.5f);
+		glColor3f(0, 0, 1);  glVertex3f(0.5f, 0.5f, 0.5f);
+		glColor3f(0.5, 0.5, 0.5);  glVertex3f(0.5f, -0.5f, 0.5f);
+
+		glColor3f(1, 1, 1);  glVertex3f(-0.5f, -0.5f, -0.5f);
+		glColor3f(1, 0, 0);  glVertex3f(0.5f, -0.5f, -0.5f);
+		glColor3f(0.5, 0.5, 0.5);  glVertex3f(0.5f, -0.5f, 0.5f);
+		glColor3f(1, 1, 1);  glVertex3f(-0.5f, -0.5f, 0.5f);
+
+		glColor3f(1, 1, 0);  glVertex3f(-0.5f, 0.5f, -0.5f);
+		glColor3f(0, 1, 0);  glVertex3f(0.5f, 0.5f, -0.5f);
+		glColor3f(0, 0, 1);  glVertex3f(0.5f, 0.5f, 0.5f);
+		glColor3f(1, 0, 1);  glVertex3f(-0.5f, 0.5f, 0.5f);
+
+		glColor3f(0, 1, 1);  glVertex3f(-0.5f, -0.5f, -0.5f);
+		glColor3f(1, 1, 0);  glVertex3f(-0.5f, 0.5f, -0.5f);
+		glColor3f(0, 1, 0);  glVertex3f(0.5f, 0.5f, -0.5f);
+		glColor3f(1, 0, 0);  glVertex3f(0.5f, -0.5f, -0.5f);
+
+		glColor3f(1, 1, 1);  glVertex3f(-0.5f, -0.5f, 0.5f);
+		glColor3f(1, 0, 1);  glVertex3f(-0.5f, 0.5f, 0.5f);
+		glColor3f(0, 0, 1);  glVertex3f(0.5f, 0.5f, 0.5f);
+		glColor3f(0.5, 0.5, 0.5);  glVertex3f(0.5f, -0.5f, 0.5f);
+	}glEnd();
+
+	glutSwapBuffers();
+}
+
+
 void InitFuncVector()
 {
 	//vFunc.push_back(RenderRectangle);
 	//vFunc.push_back(RenderTriangle);
-	vFunc.push_back(RenderSolidCube);
+	vFunc.push_back(RenderSolidCube2);
+	//vFunc.push_back(RenderSolidCube);
 }
 
 void Update(void)
@@ -554,8 +600,6 @@ void Reshape(int width, int height)
 	glLoadIdentity();
 	gluPerspective(65.0f, w / h, 1.0f, 1000.0f);
 }
-
-
 
 
 int main(int argc, char* argv[])
@@ -590,11 +634,10 @@ int main(int argc, char* argv[])
 	//initShaderSquares();
 	//initShaderTriangle();
 
-	initVBO();
-	initShaderCube();
-
+	//initVBO();
 	//initShaderCube();
-	//initShaderCube2();
+
+	initShaderCube2();
 
 
 	glutIdleFunc(Update);
